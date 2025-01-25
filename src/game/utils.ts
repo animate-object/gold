@@ -1,5 +1,5 @@
 import { Season } from "../types";
-import type { GameState } from "../types";
+import type { CardId, GameState } from "../types";
 
 export const currentTurnSeason = (turn: number): Season => {
   if (turn <= 4) return Season.Spring;
@@ -8,15 +8,15 @@ export const currentTurnSeason = (turn: number): Season => {
   return Season.Winter;
 };
 
-export const cardAtTurn = (turn: number, gameState: GameState) => {
-  return gameState.tableau[currentTurnSeason(turn)][(turn % 4) - 1];
+export const currentTurnIndex = (turn: number): number => {
+  return (turn % 4) - 1;
 };
 
-export const turnForCard = (cardId: number, gameState: GameState) => {
-  // iterate over all cards in tableau
-  // return the turn number of the card
+export const cardAtTurn = (turn: number, gameState: GameState) => {
+  return gameState.tableau[currentTurnSeason(turn)][currentTurnIndex(turn)];
+};
 
+export const turnForCard = (cardId: CardId, gameState: GameState) => {
   const cards = Object.values(gameState.tableau).flat();
-
-  return cards.findIndex((card) => card.id === cardId) + 1;
+  return cards.findIndex((card) => card === cardId) + 1;
 };

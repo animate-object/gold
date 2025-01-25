@@ -35,7 +35,7 @@ const DemoCard: CardT[] = [
 
 export function App() {
   return (
-    <div className="bg-blue-200 h-screen w-full m-0 absolute top-0">
+    <div className="bg-slate-50 h-screen w-full m-0 absolute top-0">
       <div className="flex flex-wrap gap-1">
         {DemoCard.map((card) => (
           <Card card={card} />

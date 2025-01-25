@@ -18,10 +18,18 @@ interface Recurring {
 
 type Recurrence = "once" | Recurring;
 
-interface TagMatchRules {
+export interface TagMatchRules {
+  hasTagMatch: true;
   matchingAny?: Tags[];
   matchingAll?: Tags[];
   matchingNone?: Tags[];
+  seasons?: Season[];
+  // this construction allows us to model rules like '+1 X per N matches'
+  // in its absence the implied ratio is 1:1
+  ratio?: {
+    matches: number;
+    value: number;
+  };
 }
 
 /**
@@ -49,8 +57,12 @@ export interface DraftCostRule {
 /**
  * Changes the players resource pool either immediately or
  * on a recurring basis
+ *
+ * When a tag match rule is present, the resource change occurs if
+ * the tag match rule is satisfied. The resources are applied according
+ * to the `ratio` property.
  */
-export interface ResourceRule {
+export interface ResourceRule extends TagMatchRules {
   type: "resources";
   resources: Partial<ResourcePool>;
   recurrence: Recurrence;
@@ -84,7 +96,6 @@ export interface ScoringRule {
  */
 export interface ReplacementRule extends TagMatchRules {
   type: "replacement";
-  seasons?: Season[];
   index: "first" | "last";
 }
 

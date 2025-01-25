@@ -1,3 +1,4 @@
+import { CardId } from "../types";
 import type {
   ApplyEndTurnRules,
   Draft,
@@ -7,7 +8,8 @@ import type {
   Select,
 } from "../types/action.types";
 import type { QueueAugmentedState } from "../types/engine.types";
-import { currentTurnSeason } from "./utils";
+import { drawCards } from "./deck";
+import { currentTurnIndex, currentTurnSeason } from "./utils";
 
 // steps in a turn:
 //
@@ -30,31 +32,57 @@ import { currentTurnSeason } from "./utils";
 
 const draftCards = (
   state: QueueAugmentedState,
-  action: Draft
+  _action: Draft
 ): QueueAugmentedState => {
-  const updated = { ...state };
-
   const currentSeason = currentTurnSeason(state.turn);
-
   const seasonDeck = state.decks[currentSeason];
-
-  // const update
-
-  return state;
+  const drawCount = state.gameConfiguration.cardsDrawnPerTurn;
+  const { drawn: faceCardIds, deck: updatedSeasonDeck } = drawCards(
+    seasonDeck,
+    drawCount
+  );
+  const faceCardsToDiscard = state.faceCardIds.filter(
+    (slot) => slot !== "empty"
+  );
+  return {
+    ...state,
+    decks: {
+      ...state.decks,
+      [currentSeason]: updatedSeasonDeck,
+    },
+    faceCardIds,
+    discard: [...state.discard, ...faceCardsToDiscard],
+  };
 };
 
 const selectCard = (
   state: QueueAugmentedState,
-  action: Select
+  { cardId }: Select
 ): QueueAugmentedState => {
-  return state;
-};
+  // TODO card needs to be paid for
 
-const placeCard = (
-  state: QueueAugmentedState,
-  action: Place
-): QueueAugmentedState => {
-  return state;
+  const updated = { ...state };
+
+  const currentSeason = currentTurnSeason(state.turn);
+  const currentTurnIndx = currentTurnIndex(state.turn);
+
+  const toDiscard: CardId[] = state.faceCardIds
+    .filter((id) => id !== cardId)
+    .filter((id) => id !== "empty");
+
+  return {
+    ...updated,
+    faceCardIds: Array(state.gameConfiguration.cardsDrawnPerTurn).fill("empty"),
+    tableau: {
+      ...state.tableau,
+      [currentSeason]: [
+        ...state.tableau[currentSeason].slice(0, currentTurnIndx),
+        cardId,
+        ...state.tableau[currentSeason].slice(currentTurnIndx + 1),
+      ],
+    },
+    discard: [...state.discard, ...toDiscard],
+  };
 };
 
 const applyEndTurnRules = (
@@ -80,8 +108,6 @@ export const gameEngineReducer = (
       return draftCards(state, action);
     case "select":
       return selectCard(state, action);
-    case "place":
-      return placeCard(state, action);
     case "applyEndTurnRules":
       return applyEndTurnRules(state, action);
     case "incrementTurn":

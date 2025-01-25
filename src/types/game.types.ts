@@ -12,13 +12,21 @@ export interface Deck {
   drawn: CardId[];
 }
 
+type EmptySlot = "empty";
+type CardSlot = CardId | EmptySlot;
+
+interface ConfigOptions {
+  cardsDrawnPerTurn: number;
+}
+
 export interface GameState {
   turn: number;
-  tableau: Record<Season, CardId[]>;
+  tableau: Record<Season, CardSlot[]>;
   resources: ResourcePool;
   decks: Record<Season, Deck>;
   discard: CardId[];
-  faceCardIds: number[];
+  faceCardIds: CardSlot[];
+  gameConfiguration: ConfigOptions;
 }
 
 // score is always derived, not stateful,

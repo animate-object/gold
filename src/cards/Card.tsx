@@ -7,20 +7,17 @@ interface Props {
 }
 
 function seasonStyles(season: CardT["season"]): string {
-  let color;
   switch (season) {
     case "spring":
-      //   color = "green";
-      return "bg-green-100 border-green-500";
+      return "bg-green-50 border-green-800";
     case "summer":
-      return "bg-yellow-100 border-yellow-500";
+      return "bg-yellow-50 border-yellow-500";
     case "fall":
-      return "bg-orange-100 border-orange-500";
+      return "bg-orange-50 border-orange-600";
     case "winter":
-      color = "blue";
-      return "bg-blue-100 border-blue-500";
+      return "bg-blue-50 border-blue-800";
     default:
-      return "bg-slate-100 border-slate-500";
+      return "bg-slate-50 border-slate-700";
   }
 }
 
@@ -35,7 +32,9 @@ export function CardTags({ card: { tags } }: Props) {
 }
 
 export const CardRules = ({ card }: Props) => {
-  return <div className="flex flex-shrink h-full">Rules placeholder</div>;
+  return (
+    <div className="flex flex-shrink h-full text-sm">Rules placeholder</div>
+  );
 };
 
 export function Card({ card }: Props) {
@@ -46,7 +45,7 @@ export function Card({ card }: Props) {
 
   return (
     <div className={classNames("border", seasonStyle, cardClasses)}>
-      <h1 className="text-xl">{card.name}</h1>
+      <h1 className="text-lg">{card.name}</h1>
       <CardRules card={card} />
       <CardTags card={card} />
     </div>

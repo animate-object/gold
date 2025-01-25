@@ -1,7 +1,8 @@
+import { CardId } from "./card.types";
+
 export type GameActionType =
   | "draft"
   | "select"
-  | "place"
   | "applyEndTurnRules"
   | "incrementTurn";
 
@@ -15,11 +16,7 @@ export interface Draft extends GameActionBase {
 
 export interface Select extends GameActionBase {
   type: "select";
-  cardId: string;
-}
-
-export interface Place extends GameActionBase {
-  type: "place";
+  cardId: CardId;
 }
 
 export interface ApplyEndTurnRules extends GameActionBase {
