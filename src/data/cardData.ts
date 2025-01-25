@@ -1,102 +1,3 @@
-// Silver spoon	0 Beginnings	wealth	family
-// Overbearing mother	0 Beginnings	family	health
-// Strict father	0 Beginnings	discipline	career
-// Military brat	0 Beginnings	discipline	travel
-// Religious upbringing	0 Beginnings	faith	community
-// Struggling family	0 Beginnings	family
-// Single parent	0 Beginnings	family
-// Older siblings	0 Beginnings	family
-// Small town life	0 Beginnings	community	sunshine
-// Farm kid	0 Beginnings	sunshine	discipline
-// Urban elite	0 Beginnings	family	education
-// Eldest child	0 Beginnings	family
-// Child of immigrants	0 Beginnings	family	community
-// Orphan	0 Beginnings	tragedy
-// Only child	0 Beginnings	family
-// Twin	0 Beginnings	family	friend
-// Family dog	1 Spring	friend	sunshine
-// Talented athlete	1 Spring	sunshine	health
-// First love	1 Spring	love
-// Mathlete	1 Spring	intellect	career
-// Class clown	1 Spring	confidence	friend
-// Scout	1 Spring	discipline	sunshine
-// State champs	1 Spring	discipline	confidence
-// Baby brother/sister	1 Spring	family
-// Beloved grandparent	1 Spring	family	friend
-// First job	1 Spring	career	wealth
-// It takes a village	1 Spring	community	influence
-// "We moved a lot"	1 Spring	travel
-// Summer camp	1 Spring	sunshine	creative
-// Childhood illness	1 Spring	health
-// troublemaker	1 Spring	confidence	creative
-// First chair	1 Spring	creative
-// Sacred choral	1 Spring	faith	creative
-// Gifted	1 Spring	intellect	creative
-// Popular	1 Spring	friend	community
-// Studious	1 Spring	education	intellect
-// College	2 Summer	education	community
-// Grad school	2 Summer	education	career
-// Starving artist	2 Summer	creative
-// Used car	2 Summer	career
-// Luxury vehicle	2 Summer	influence	career
-// Apartment living	2 Summer
-// Blue collar	2 Summer	career	confidence
-// Cubical farm	2 Summer	career	wealth
-// Fraternity	2 Summer	community	influence
-// Drinking buddies	2 Summer	friend
-// Gap year	2 Summer	travel
-// Childfree	2 Summer	wealth	travel
-// The one	2 Summer	love
-// Prodigal	2 Summer	faith	community
-// Sharp	2 Summer	career	intellect
-// Hustle	2 Summer	career	discipline
-// Service (military)	2 Summer	discipline	community
-// Homeownership	2 Summer	wealth	family
-// Devout	2 Summer	faith
-// Matrimony	2 Summer	love	faith
-// Mentee	3 Fall	education	friend
-// World Travel	3 Fall	travel
-// Executive	3 Fall	career	wealth
-// Empty Nesters	3 Fall	family
-// Hobbyist	3 Fall	creative	intellect
-// Marathon	3 Fall	health	discipline
-// Doctor's Orders	3 Fall	health
-// National Parks	3 Fall	sunshine	travel
-// Deacon	3 Fall	faith	community
-// Down sizing	3 Fall	family	wealth
-// Old friends	3 Fall	friend
-// Jam band	3 Fall	creative	community
-// Councilperson	3 Fall	community	influence
-// Good Investing	3 Fall	wealth
-// 15 Minutes	3 Fall	influence
-// League (e.g. bowling)	3 Fall	community	friend
-// Family Reunions	3 Fall	family
-// Expansion (franchising)	3 Fall	career	wealth
-// Competence	3 Fall	confidence	education
-// Cornerstone	3 Fall	community	influence
-// Grand Children	4 Winter	family
-// Old Fools	4 Winter	love
-// Charitable Donations	4 Winter	influence	community
-// Constitutional	4 Winter	health	friend
-// 50 years (anniversary)	4 Winter	love
-// Lifetime Achievement Award	4 Winter	career
-// Sunshine Acres	4 Winter	community	health
-// Memoirist	4 Winter	creative	intellect
-// Matriarch/Patriarch	4 Winter	family	influence
-// Bridge club	4 Winter	friend	community
-// Beautiful Garden	4 Winter	sunshine
-// Golf Buddies	4 Winter	friend	wealth
-// Fishing Buddies	4 Winter	friend	sunshine
-// Memories	4 Winter	friend	love
-// Solace	4 Winter	faith
-// snowbirds	4 Winter	travel
-// Four Generations	4 Winter	family
-// A life's work (e.g. art)	4 Winter	creative
-// Back to work	4 Winter	career
-// Visitors	4 Winter	friend
-// Found Family	2 Summer	family	community
-// Mentor
-
 import { Card, Season, Tags } from "../types";
 
 // beginnings cards are special spring cards
@@ -106,19 +7,56 @@ const BEGINNINGS_CARDS: Omit<Card, "id">[] = [
     name: "Silver Spoon",
     season: Season.Spring,
     tags: [Tags.wealth, Tags.family],
-    rules: [],
+    rules: [
+      {
+        type: "resources",
+        resources: {
+          money: 2,
+          influence: 1,
+        },
+        recurrence: "once",
+      },
+
+      {
+        type: "resources",
+        resources: {
+          money: 2,
+          influence: 1,
+        },
+        recurrence: {
+          seasons: [Season.Spring, Season.Summer],
+          trigger: "end-of-season",
+        },
+      },
+    ],
   },
   {
     name: "Overbearing Mother",
     season: Season.Spring,
     tags: [Tags.family, Tags.health],
-    rules: [],
+    rules: [
+      {
+        type: "resources",
+        resources: {
+          money: 1,
+        },
+        recurrence: "once",
+      },
+    ],
   },
   {
     name: "Strict Father",
     season: Season.Spring,
     tags: [Tags.discipline, Tags.career],
-    rules: [],
+    rules: [
+      {
+        type: "resources",
+        resources: {
+          money: 1,
+        },
+        recurrence: "once",
+      },
+    ],
   },
   {
     name: "Military Brat",
@@ -148,7 +86,26 @@ const BEGINNINGS_CARDS: Omit<Card, "id">[] = [
     name: "Older Siblings",
     season: Season.Spring,
     tags: [Tags.family],
-    rules: [],
+    rules: [
+      {
+        type: "resources",
+        resources: {
+          influence: 1,
+        },
+        recurrence: {
+          seasons: [Season.Spring, Season.Summer],
+          trigger: "end-of-season",
+        },
+        match: {
+          match: "any",
+          tags: [Tags.family, Tags.friend],
+          ratio: {
+            matches: 2,
+            value: 1,
+          },
+        },
+      },
+    ],
   },
   {
     name: "Small Town Life",
@@ -223,7 +180,16 @@ const SPRING_CARDS: Omit<Card, "id">[] = [
     name: "Mathlete",
     season: Season.Spring,
     tags: [Tags.intellect, Tags.career],
-    rules: [],
+    rules: [
+      {
+        type: "replacement",
+        match: {
+          tags: [Tags.family],
+          match: "all",
+        },
+        index: "first",
+      },
+    ],
   },
   {
     name: "Class Clown",

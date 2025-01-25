@@ -19,10 +19,8 @@ interface Recurring {
 type Recurrence = "once" | Recurring;
 
 export interface TagMatchRules {
-  hasTagMatch: true;
-  matchingAny?: Tags[];
-  matchingAll?: Tags[];
-  matchingNone?: Tags[];
+  tags: Tags[];
+  match: "all" | "any" | "none";
   seasons?: Season[];
   // this construction allows us to model rules like '+1 X per N matches'
   // in its absence the implied ratio is 1:1
@@ -47,7 +45,7 @@ export interface CostRule {
  * Resources in `resources` are added or discounted from the cost of the card
  */
 export interface DraftCostRule {
-  type: "cost";
+  type: "draft-cost";
   resources: Partial<ResourcePool>;
   tags: Tags[];
   // if present, the rule only applies to the specified season(s)
@@ -62,15 +60,17 @@ export interface DraftCostRule {
  * the tag match rule is satisfied. The resources are applied according
  * to the `ratio` property.
  */
-export interface ResourceRule extends TagMatchRules {
+export interface ResourceRule {
   type: "resources";
   resources: Partial<ResourcePool>;
   recurrence: Recurrence;
+  match?: TagMatchRules;
 }
 
-interface ScoreCondition extends TagMatchRules {
+interface ScoreCondition {
   negate: boolean;
   seasons: Season[];
+  match: TagMatchRules;
 }
 
 interface ScoreDescriptor {
@@ -94,9 +94,10 @@ export interface ScoringRule {
  * Resources and game state are not recomputed, but can
  * impact final scoring
  */
-export interface ReplacementRule extends TagMatchRules {
+export interface ReplacementRule {
   type: "replacement";
   index: "first" | "last";
+  match: TagMatchRules;
 }
 
 export type { Rule };

@@ -1,4 +1,4 @@
-import { Season } from "../types";
+import { Decks, Season } from "../types";
 
 export function cardSeasonStyles(season: Season | "empty"): string {
   switch (season) {
@@ -54,7 +54,17 @@ export function seasonBgLightStyles(season: Season): string {
   }
 }
 
-export function seasonBgCardFaceStyles(season: Season): string {
+export function seasonBgCardFaceStyles(
+  season: Season,
+  beginningCard: boolean = false,
+  misfortuneCard: boolean = false
+): string {
+  if (beginningCard) {
+    return "bg-purple-50";
+  }
+  if (misfortuneCard) {
+    return "bg-red-50";
+  }
   switch (season) {
     case Season.Spring:
       return "bg-green-50";
@@ -67,7 +77,7 @@ export function seasonBgCardFaceStyles(season: Season): string {
   }
 }
 
-export function seasonBgDeckStyles(season: Season): string {
+export function seasonBgDeckStyles(season: Decks): string {
   switch (season) {
     case Season.Spring:
       return "bg-green-200";
@@ -77,6 +87,10 @@ export function seasonBgDeckStyles(season: Season): string {
       return "bg-orange-200";
     case Season.Winter:
       return "bg-blue-200";
+    case "beginnings":
+      return "bg-purple-200";
+    case "misfortune":
+      return "bg-red-200";
   }
 }
 
@@ -93,7 +107,7 @@ export function seasonBgBoldStyles(season: Season): string {
   }
 }
 
-export function seasonShadowStyles(season: Season): string {
+export function seasonShadowStyles(season: Decks): string {
   switch (season) {
     case Season.Spring:
       return "shadow-md shadow-green-500/50";
@@ -103,6 +117,10 @@ export function seasonShadowStyles(season: Season): string {
       return "shadow-md shadow-orange-500/50";
     case Season.Winter:
       return "shadow-md shadow-blue-500/50";
+    case "beginnings":
+      return "shadow-md shadow-purple-300/50";
+    case "misfortune":
+      return "shadow-md shadow-red-300/50";
   }
 }
 

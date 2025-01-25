@@ -1,16 +1,15 @@
 import classNames from "classnames";
 import { Badge } from "../components/Badge";
-import { CardId, Card as CardT, Season } from "../types";
+import { CardId, Card as CardT, DisplayableDecks } from "../types";
 import { useMemo } from "preact/hooks";
 import { getCard } from "./store";
 import {
-  seasonBgLightStyles,
   seasonShadowStyles,
   cardSeasonStyles,
-  seasonBgBoldStyles,
   seasonBgDeckStyles,
   seasonBgCardFaceStyles,
 } from "../utils/seasonStyles";
+import { describeRule } from "./ruleDescriptors";
 
 interface CardDisplayProps {
   card: CardT;
@@ -28,7 +27,18 @@ export function CardTags({ card: { tags } }: CardDisplayProps) {
 
 export const CardRules = ({ card }: CardDisplayProps) => {
   return (
-    <div className="flex flex-shrink h-full text-sm">Rules placeholder</div>
+    <div className="flex flex-shrink h-full text-sm">
+      <div className="flex flex-col gap-1">
+        {card.rules.map((rule, index) => (
+          <span
+            className="hover:bg-slate-200 p-1 rounded select-none"
+            key={index}
+          >
+            {describeRule(rule)}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -45,7 +55,7 @@ export function Card({ cardId, onClick }: Props) {
 
   const seasonStyle = classNames(
     seasonShadowStyles(card.season),
-    seasonBgCardFaceStyles(card.season)
+    seasonBgCardFaceStyles(card.season, card.beginningCard)
   );
 
   return (
@@ -67,7 +77,7 @@ export function Deck({
   variant,
   label,
 }: {
-  variant: Season | "discard";
+  variant: DisplayableDecks;
   label: string;
 }) {
   const seasonStyle =

@@ -1,5 +1,10 @@
 import { getCard } from "../cards/store";
-import { currentTurnSeason, turnForCard } from "../game/utils";
+import {
+  currentTurnIsEndOfSeason,
+  currentTurnSeason,
+  getAllCardsInOrderOfPlay,
+  turnForCard,
+} from "./selectors";
 import {
   GameState,
   ResourceRule,
@@ -69,9 +74,10 @@ const doesResourceCardApplyOnCurrentTurn = (
     return turnForCard(cardId, gameState) === gameState.turn;
   }
 
-  const currentSeason = currentTurnSeason(gameState.turn);
+  const currentSeason = currentTurnSeason(gameState);
 
   if (recurrence.seasons && !recurrence.seasons?.includes(currentSeason)) {
+    console.debug("resource rule does not apply in current season");
     return false;
   }
 
@@ -79,8 +85,10 @@ const doesResourceCardApplyOnCurrentTurn = (
     return true;
   }
   if (recurrence.trigger === "end-of-season") {
-    return gameState.turn % 4 === 0;
+    return currentTurnIsEndOfSeason(gameState);
   }
+
+  console.warn("unknown recurrence trigger");
 
   return false;
 };
@@ -90,19 +98,26 @@ const applyResourceRule = (
   rule: ResourceRule,
   gameState: GameState
 ) => {
+  console.log("applying resource rule");
   const resources = { ...gameState.resources };
 
   if (!doesResourceCardApplyOnCurrentTurn(cardId, rule.recurrence, gameState)) {
+    console.log("resource card does not apply on current turn");
     return gameState;
   }
 
   let resourcesToApply = rule.resources;
-  if (rule.hasTagMatch) {
-    const [_, transformResources] = countMatchingCards(rule, gameState);
+  if (rule.match) {
+    console.log("applying match for resource rule");
+    const [count, transformFactor] = countMatchingCards(rule.match, gameState);
+    console.debug(`matches: ${count}, transformFactor: ${transformFactor}`);
+
     resourcesToApply = Object.keys(resourcesToApply).reduce(
       (acc: Partial<ResourcePool>, key: string) => {
-        const cast = key as keyof ResourcePool;
-        acc[cast] = transformResources * (acc[cast] ?? 0);
+        const resourceKey = key as keyof ResourcePool;
+        const orig = resourcesToApply[resourceKey];
+        const transformed = (orig ?? 0) * transformFactor;
+        acc[resourceKey] = transformed;
         return acc;
       },
       {} as Partial<ResourcePool>
@@ -116,6 +131,9 @@ const applyResourceRule = (
     resources[resourceKey] = oldValue + value;
   });
 
+  console.debug("applying resources", resourcesToApply);
+  console.debug("new resources", resources);
+
   return {
     ...gameState,
     resources,
@@ -123,18 +141,16 @@ const applyResourceRule = (
 };
 
 const matchesTags = (tags: Tags[], rule: TagMatchRules) => {
-  let matches = false;
-
-  if (rule.matchingAll) {
-    matches = rule.matchingAll.every((tag) => tags.includes(tag));
+  if (rule.match === "all") {
+    return rule.tags.every((tag) => tags.includes(tag));
   }
-  if (rule.matchingAny) {
-    matches = rule.matchingAny.some((tag) => tags.includes(tag));
+  if (rule.match === "any") {
+    return rule.tags.some((tag) => tags.includes(tag));
   }
-  if (rule.matchingNone) {
-    matches = !rule.matchingNone.some((tag) => tags.includes(tag));
+  if (rule.match === "none") {
+    return !rule.tags.some((tag) => tags.includes(tag));
   }
-  return matches;
+  return false;
 };
 
 const applyReplacementRule = (
@@ -144,17 +160,18 @@ const applyReplacementRule = (
 ) => {
   let newGameState = { ...gameState };
   const cardTurn = turnForCard(card.id, gameState);
+  const initialPlacement = scanTableauForCard(card.id, gameState);
 
   if (cardTurn !== gameState.turn) {
     return gameState;
   }
 
-  if (!rule.hasTagMatch) {
+  if (!rule.match) {
     console.warn("replacement rule must have a tag match");
     return gameState;
   }
 
-  const [matchingCards, _count] = countMatchingCards(rule, gameState);
+  const [matchingCards, _count] = countMatchingCards(rule.match, gameState);
 
   if (matchingCards.length === 0) {
     console.warn("no matching cards");
@@ -172,22 +189,37 @@ const applyReplacementRule = (
     return gameState;
   }
 
-  const [season, index] = location;
+  const [repaceSeason, replaceIndex] = location;
+  const [removeSeason, removeIndex] = initialPlacement!;
+
+  const removeFromTableau = {
+    ...newGameState.tableau,
+    [removeSeason]: [
+      ...newGameState.tableau[removeSeason].slice(0, removeIndex),
+      "empty",
+      ...newGameState.tableau[removeSeason].slice(removeIndex + 1),
+    ],
+  };
+
+  const replaceInTableau = {
+    ...removeFromTableau,
+    [repaceSeason]: [
+      ...removeFromTableau[repaceSeason].slice(0, replaceIndex),
+      card.id,
+      ...removeFromTableau[repaceSeason].slice(replaceIndex + 1),
+    ],
+  };
 
   return {
     ...newGameState,
-    tableau: {
-      ...newGameState.tableau,
-      [season]: [
-        ...newGameState.tableau[season].slice(0, index),
-        card.id,
-        ...newGameState.tableau[season].slice(index + 1),
-      ],
-    },
+    // this leaves you with one less card in the tableau
+    // so we need another turn to fill it
+    turn: newGameState.turn - 1,
+    tableau: replaceInTableau,
   };
 };
 
-export const applyGameStateRules = (
+export const applyAllTurnEndRules = (
   card: CardT,
   rule: Rule,
   gameState: GameState
@@ -199,6 +231,29 @@ export const applyGameStateRules = (
     return applyReplacementRule(card, rule, gameState);
   }
   return gameState;
+};
+
+const isTurnEndRule = (rule: Rule): rule is ResourceRule | ReplacementRule => {
+  return rule.type === "resources" || rule.type === "replacement";
+};
+
+export const applyAllTurnEndRulesOnTableau = (
+  gameState: GameState
+): GameState => {
+  const allCards = getAllCardsInOrderOfPlay(gameState);
+  const rulesAndCards = allCards
+    .map((cardId) => {
+      const card = getCard(cardId);
+      return card.rules.filter(isTurnEndRule).map((rule) => ({ rule, card }));
+    })
+    .flat();
+
+  console.log(rulesAndCards);
+
+  return rulesAndCards.reduce(
+    (state, { rule, card }) => applyAllTurnEndRules(card, rule, state),
+    gameState
+  );
 };
 
 // TODO: scoring

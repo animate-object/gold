@@ -8,7 +8,12 @@ import type {
 } from "../types/action.types";
 import type { QueueAugmentedState } from "../types/engine.types";
 import { drawCards } from "./deck";
-import { currentTurnIndex, currentTurnSeason } from "./utils";
+import { applyAllTurnEndRulesOnTableau } from "./ruleEngine";
+import {
+  currentTurnIndex,
+  currentTurnSeason,
+  getCurrentDeck,
+} from "./selectors";
 
 // steps in a turn:
 //
@@ -33,10 +38,10 @@ const draftCards = (
   state: QueueAugmentedState,
   _action: Draft
 ): QueueAugmentedState => {
-  const currentSeason = currentTurnSeason(state.turn);
-  const seasonDeck = state.decks[currentSeason];
+  const deck = getCurrentDeck(state);
+  const seasonDeck = state.decks[deck];
   const drawCount = state.gameConfiguration.cardsDrawnPerTurn;
-  const { drawn: faceCardIds, deck: updatedSeasonDeck } = drawCards(
+  const { drawn: faceCardIds, deck: updatedDeck } = drawCards(
     seasonDeck,
     drawCount
   );
@@ -47,7 +52,7 @@ const draftCards = (
     ...state,
     decks: {
       ...state.decks,
-      [currentSeason]: updatedSeasonDeck,
+      [deck]: updatedDeck,
     },
     faceCardIds,
     discard: [...state.discard, ...faceCardsToDiscard],
@@ -62,8 +67,8 @@ const selectCard = (
 
   const updated = { ...state };
 
-  const currentSeason = currentTurnSeason(state.turn);
-  const currentTurnIndx = currentTurnIndex(state.turn);
+  const currentSeason = currentTurnSeason(state);
+  const currentTurnIndx = currentTurnIndex(state);
 
   const toDiscard: CardId[] = state.faceCardIds
     .filter((id) => id !== cardId)
@@ -84,6 +89,10 @@ const selectCard = (
     },
     discard: [...state.discard, ...toDiscard],
     queue: [
+      ...state.queue,
+      {
+        type: "applyEndTurnRules",
+      },
       {
         type: "incrementTurn",
       },
@@ -96,9 +105,9 @@ const selectCard = (
 
 const applyEndTurnRules = (
   state: QueueAugmentedState,
-  action: ApplyEndTurnRules
+  _: ApplyEndTurnRules
 ): QueueAugmentedState => {
-  return state;
+  return applyAllTurnEndRulesOnTableau(state) as QueueAugmentedState;
 };
 
 const incrementTurn = (

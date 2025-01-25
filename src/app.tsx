@@ -2,49 +2,17 @@ import classNames from "classnames";
 import "./app.css";
 import { Card, Deck, EmptyCard } from "./cards/Card";
 import { useGameQueue } from "./game/engine";
-import { Card as CardT, Tags, Season, GameState } from "./types";
+import { Season, GameState } from "./types";
 import {
   seasonBgLightStyles,
-  seasonShadowStyles,
   seasonShadowSubtleStyles,
   seasonTextStyles,
 } from "./utils/seasonStyles";
 import { getShuffledDecks } from "./cards/definitions";
 import { useEffect } from "preact/hooks";
-import { currentTurnSeason } from "./game/utils";
+import { getCurrentDeck } from "./game/selectors";
 
 const _capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
-const DemoCard: CardT[] = [
-  {
-    id: 1,
-    name: "Family Dog",
-    season: Season.Spring,
-    tags: [Tags.friend, Tags.sunshine],
-    rules: [],
-  },
-  {
-    id: 2,
-    name: "Drinking Buddies",
-    season: Season.Summer,
-    tags: [Tags.friend],
-    rules: [],
-  },
-  {
-    id: 3,
-    name: "Jam Band",
-    season: Season.Fall,
-    tags: [Tags.creative, Tags.community],
-    rules: [],
-  },
-  {
-    id: 4,
-    name: "Solace",
-    season: Season.Winter,
-    tags: [Tags.faith],
-    rules: [],
-  },
-];
 
 const EMPTY_GAME_STATE: GameState = {
   turn: 0,
@@ -56,7 +24,7 @@ const EMPTY_GAME_STATE: GameState = {
   },
   resources: {
     money: 0,
-    time: 0,
+    time: 4,
     influence: 0,
   },
   decks: getShuffledDecks(),
@@ -94,20 +62,21 @@ export const SimpleTableau = ({ tableau }: GameState) => {
 
 export function App() {
   const { state, dispatch } = useGameQueue(EMPTY_GAME_STATE, { delayMs: 0 });
-
+  const displayTurn = state.turn + 1;
   const resourcesAndScore = {
     Time: state.resources.time,
     Money: state.resources.money,
     Influence: state.resources.influence,
     Treasures: 0,
     Regrets: 0,
+    Turn: displayTurn,
   };
 
   useEffect(() => {
     dispatch({ type: "draft" });
   }, []);
 
-  const currentSeason = currentTurnSeason(state.turn);
+  const currentDeck = getCurrentDeck(state);
 
   return (
     <div className="bg-slate-50 h-screen w-full m-0 absolute top-0">
@@ -117,8 +86,8 @@ export function App() {
         <div className="flex gap-3 bg-gray-200 p-2 rounded-md mt-2">
           <Deck variant={"discard"} label="Discard" />
           <Deck
-            variant={currentSeason}
-            label={`Deck of ${_capitalize(currentSeason)}`}
+            variant={currentDeck}
+            label={`Deck of ${_capitalize(currentDeck)}`}
           />
           {state.faceCardIds.map((cardId) =>
             cardId === "empty" ? (

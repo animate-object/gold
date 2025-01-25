@@ -1,4 +1,4 @@
-import type { Season } from "./season.types";
+import type { Decks, Season } from "./season.types";
 import type { CardId } from "./card.types";
 
 export interface ResourcePool {
@@ -23,7 +23,7 @@ export interface GameState {
   turn: number;
   tableau: Record<Season, CardSlot[]>;
   resources: ResourcePool;
-  decks: Record<Season, Deck>;
+  decks: Record<Decks, Deck>;
   discard: CardId[];
   faceCardIds: CardSlot[];
   gameConfiguration: ConfigOptions;
