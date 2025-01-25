@@ -28,6 +28,7 @@ export const useGameQueue = (
     if (state.queue.length > 0) {
       const nextAction = state.queue[0];
       setTimeout(() => {
+        console.log("Processing next action", nextAction);
         dispatch(nextAction);
       }, opts.delayMs ?? 0);
     }

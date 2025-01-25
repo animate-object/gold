@@ -4,7 +4,6 @@ import type {
   Draft,
   GameAction,
   IncrementTurn,
-  Place,
   Select,
 } from "../types/action.types";
 import type { QueueAugmentedState } from "../types/engine.types";
@@ -70,18 +69,28 @@ const selectCard = (
     .filter((id) => id !== cardId)
     .filter((id) => id !== "empty");
 
+  const updatedSeason = [
+    ...state.tableau[currentSeason].slice(0, currentTurnIndx),
+    cardId,
+    ...state.tableau[currentSeason].slice(currentTurnIndx + 1),
+  ];
+
   return {
     ...updated,
     faceCardIds: Array(state.gameConfiguration.cardsDrawnPerTurn).fill("empty"),
     tableau: {
       ...state.tableau,
-      [currentSeason]: [
-        ...state.tableau[currentSeason].slice(0, currentTurnIndx),
-        cardId,
-        ...state.tableau[currentSeason].slice(currentTurnIndx + 1),
-      ],
+      [currentSeason]: updatedSeason,
     },
     discard: [...state.discard, ...toDiscard],
+    queue: [
+      {
+        type: "incrementTurn",
+      },
+      {
+        type: "draft",
+      },
+    ],
   };
 };
 
@@ -96,24 +105,41 @@ const incrementTurn = (
   state: QueueAugmentedState,
   action: IncrementTurn
 ): QueueAugmentedState => {
-  return state;
+  return {
+    ...state,
+    turn: state.turn + 1,
+  };
 };
 
 export const gameEngineReducer = (
   state: QueueAugmentedState,
   action: GameAction
 ): QueueAugmentedState => {
+  const popCurrentActionFromQueue =
+    state.queue.length > 0
+      ? state.queue[0].type === action.type
+        ? state.queue.slice(1)
+        : state.queue
+      : state.queue;
+
+  let updated = { ...state, queue: popCurrentActionFromQueue };
+
   switch (action.type) {
     case "draft":
-      return draftCards(state, action);
+      updated = draftCards(updated, action);
+      break;
     case "select":
-      return selectCard(state, action);
+      updated = selectCard(updated, action);
+      break;
     case "applyEndTurnRules":
-      return applyEndTurnRules(state, action);
+      updated = applyEndTurnRules(updated, action);
+      break;
     case "incrementTurn":
-      return incrementTurn(state, action);
+      updated = incrementTurn(updated, action);
+      break;
     default:
       console.warn("Unhandled action", action);
-      return state;
   }
+
+  return updated;
 };

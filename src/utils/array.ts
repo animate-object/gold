@@ -15,6 +15,13 @@ export function chooseOne<T>(
   return array[Math.floor(nextRandom() * array.length)];
 }
 
+export function shuffle<T>(
+  array: T[],
+  nextRandom: NextRandom = Math.random
+): T[] {
+  return array.sort(() => nextRandom() - 0.5);
+}
+
 export function chooseN<T>(
   array: T[],
   n: number,

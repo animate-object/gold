@@ -38,6 +38,7 @@ interface Card {
   name: string;
   season: Season;
   tags: Tags[];
+  beginningCard?: boolean;
 }
 
 export type { Card, CardId };

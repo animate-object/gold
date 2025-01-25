@@ -1,27 +1,15 @@
 import classNames from "classnames";
 import { Badge } from "../components/Badge";
-import { Card as CardT } from "../types";
+import { CardId, Card as CardT, Season } from "../types";
+import { useMemo } from "preact/hooks";
+import { getCard } from "./store";
+import { cardSeasonStyles } from "../utils/seasonStyles";
 
-interface Props {
+interface CardDisplayProps {
   card: CardT;
 }
 
-function seasonStyles(season: CardT["season"]): string {
-  switch (season) {
-    case "spring":
-      return "bg-green-50 border-green-800";
-    case "summer":
-      return "bg-yellow-50 border-yellow-500";
-    case "fall":
-      return "bg-orange-50 border-orange-600";
-    case "winter":
-      return "bg-blue-50 border-blue-800";
-    default:
-      return "bg-slate-50 border-slate-700";
-  }
-}
-
-export function CardTags({ card: { tags } }: Props) {
+export function CardTags({ card: { tags } }: CardDisplayProps) {
   return (
     <div class="flex flex-wrap gap-2">
       {tags.map((tag) => (
@@ -31,23 +19,54 @@ export function CardTags({ card: { tags } }: Props) {
   );
 }
 
-export const CardRules = ({ card }: Props) => {
+export const CardRules = ({ card }: CardDisplayProps) => {
   return (
     <div className="flex flex-shrink h-full text-sm">Rules placeholder</div>
   );
 };
 
-export function Card({ card }: Props) {
-  const seasonStyle = seasonStyles(card.season);
+interface Props {
+  cardId: CardId;
+  onClick?: () => void;
+}
 
-  const cardClasses =
-    "flex flex-col h-64 w-40 p-2 m-4 rounded overflow-hidden shadow-md border-2";
+const CARD_CLASSES =
+  "flex flex-col h-48 w-32 p-2 rounded overflow-hidden shadow-md border-2";
+
+export function Card({ cardId, onClick }: Props) {
+  const card = useMemo(() => getCard(cardId), [cardId]);
+
+  const seasonStyle = cardSeasonStyles(card.season);
 
   return (
-    <div className={classNames("border", seasonStyle, cardClasses)}>
+    <div className={classNames(seasonStyle, CARD_CLASSES)} onClick={onClick}>
       <h1 className="text-lg">{card.name}</h1>
       <CardRules card={card} />
       <CardTags card={card} />
+    </div>
+  );
+}
+
+export function EmptyCard() {
+  return (
+    <div className={classNames(CARD_CLASSES, cardSeasonStyles("empty"))} />
+  );
+}
+
+export function Deck({
+  variant,
+  label,
+}: {
+  variant: Season | "discard";
+  label: string;
+}) {
+  const seasonStyle =
+    variant === "discard"
+      ? "bg-slate-300 border-slate-900"
+      : cardSeasonStyles(variant);
+  return (
+    <div className={classNames(CARD_CLASSES, seasonStyle)}>
+      <h1 className="text-lg">{label}</h1>
     </div>
   );
 }

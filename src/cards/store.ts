@@ -5,8 +5,8 @@
 import type { Card } from "../types";
 import { allCards } from "./definitions";
 
-export const cardMap = allCards.reduce((acc, card, idx) => {
-  acc[idx] = { ...card, id: idx };
+export const cardMap = allCards.reduce((acc, card) => {
+  acc[card.id] = card;
   return acc;
 }, {} as Record<number, Card>);
 
