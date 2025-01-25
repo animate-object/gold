@@ -54,6 +54,32 @@ export function seasonBgLightStyles(season: Season): string {
   }
 }
 
+export function seasonBgCardFaceStyles(season: Season): string {
+  switch (season) {
+    case Season.Spring:
+      return "bg-green-50";
+    case Season.Summer:
+      return "bg-yellow-50";
+    case Season.Fall:
+      return "bg-orange-50";
+    case Season.Winter:
+      return "bg-blue-50";
+  }
+}
+
+export function seasonBgDeckStyles(season: Season): string {
+  switch (season) {
+    case Season.Spring:
+      return "bg-green-200";
+    case Season.Summer:
+      return "bg-yellow-200";
+    case Season.Fall:
+      return "bg-orange-200";
+    case Season.Winter:
+      return "bg-blue-200";
+  }
+}
+
 export function seasonBgBoldStyles(season: Season): string {
   switch (season) {
     case Season.Spring:
@@ -64,5 +90,31 @@ export function seasonBgBoldStyles(season: Season): string {
       return "bg-orange-400";
     case Season.Winter:
       return "bg-blue-400";
+  }
+}
+
+export function seasonShadowStyles(season: Season): string {
+  switch (season) {
+    case Season.Spring:
+      return "shadow-md shadow-green-500/50";
+    case Season.Summer:
+      return "shadow-md shadow-yellow-500/50";
+    case Season.Fall:
+      return "shadow-md shadow-orange-500/50";
+    case Season.Winter:
+      return "shadow-md shadow-blue-500/50";
+  }
+}
+
+export function seasonShadowSubtleStyles(season: Season): string {
+  switch (season) {
+    case Season.Spring:
+      return "shadow-md shadow-green-300/50";
+    case Season.Summer:
+      return "shadow-md shadow-yellow-300/50";
+    case Season.Fall:
+      return "shadow-md shadow-orange-300/50";
+    case Season.Winter:
+      return "shadow-md shadow-blue-300/50";
   }
 }

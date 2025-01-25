@@ -3,7 +3,12 @@ import "./app.css";
 import { Card, Deck, EmptyCard } from "./cards/Card";
 import { useGameQueue } from "./game/engine";
 import { Card as CardT, Tags, Season, GameState } from "./types";
-import { seasonBgLightStyles, seasonTextStyles } from "./utils/seasonStyles";
+import {
+  seasonBgLightStyles,
+  seasonShadowStyles,
+  seasonShadowSubtleStyles,
+  seasonTextStyles,
+} from "./utils/seasonStyles";
 import { getShuffledDecks } from "./cards/definitions";
 import { useEffect } from "preact/hooks";
 import { currentTurnSeason } from "./game/utils";
@@ -69,7 +74,8 @@ export const SimpleTableau = ({ tableau }: GameState) => {
         <div
           className={classNames(
             "flex flex-col gap-2 rounded-md p-2",
-            seasonBgLightStyles(season as Season)
+            seasonBgLightStyles(season as Season),
+            seasonShadowSubtleStyles(season as Season)
           )}
         >
           <h2 className={seasonTextStyles(season as Season)}>

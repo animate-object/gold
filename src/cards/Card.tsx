@@ -3,7 +3,14 @@ import { Badge } from "../components/Badge";
 import { CardId, Card as CardT, Season } from "../types";
 import { useMemo } from "preact/hooks";
 import { getCard } from "./store";
-import { cardSeasonStyles } from "../utils/seasonStyles";
+import {
+  seasonBgLightStyles,
+  seasonShadowStyles,
+  cardSeasonStyles,
+  seasonBgBoldStyles,
+  seasonBgDeckStyles,
+  seasonBgCardFaceStyles,
+} from "../utils/seasonStyles";
 
 interface CardDisplayProps {
   card: CardT;
@@ -31,12 +38,15 @@ interface Props {
 }
 
 const CARD_CLASSES =
-  "flex flex-col h-48 w-32 p-2 rounded overflow-hidden shadow-md border-2";
+  "flex flex-col h-48 w-32 p-2 rounded overflow-hidden shadow-md";
 
 export function Card({ cardId, onClick }: Props) {
   const card = useMemo(() => getCard(cardId), [cardId]);
 
-  const seasonStyle = cardSeasonStyles(card.season);
+  const seasonStyle = classNames(
+    seasonShadowStyles(card.season),
+    seasonBgCardFaceStyles(card.season)
+  );
 
   return (
     <div className={classNames(seasonStyle, CARD_CLASSES)} onClick={onClick}>
@@ -62,8 +72,8 @@ export function Deck({
 }) {
   const seasonStyle =
     variant === "discard"
-      ? "bg-slate-300 border-slate-900"
-      : cardSeasonStyles(variant);
+      ? "bg-slate-300 shadow-md shadow-slate-700/50"
+      : classNames(seasonShadowStyles(variant), seasonBgDeckStyles(variant));
   return (
     <div className={classNames(CARD_CLASSES, seasonStyle)}>
       <h1 className="text-lg">{label}</h1>
