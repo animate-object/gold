@@ -1,9 +1,9 @@
 import { getCard } from "../cards/store";
 import {
-  currentTurnIsEndOfSeason,
-  currentTurnSeason,
+  currentCardIsEndOfSeason,
+  currentCardSeason,
   getAllCardsInOrderOfPlay,
-  turnForCard,
+  slotForCard,
 } from "./selectors";
 import {
   GameState,
@@ -71,10 +71,10 @@ const doesResourceCardApplyOnCurrentTurn = (
   gameState: GameState
 ) => {
   if (recurrence === "once") {
-    return turnForCard(cardId, gameState) === gameState.turn;
+    return slotForCard(cardId, gameState) === gameState.cardsPlayed;
   }
 
-  const currentSeason = currentTurnSeason(gameState);
+  const currentSeason = currentCardSeason(gameState);
 
   if (recurrence.seasons && !recurrence.seasons?.includes(currentSeason)) {
     console.debug("resource rule does not apply in current season");
@@ -85,7 +85,7 @@ const doesResourceCardApplyOnCurrentTurn = (
     return true;
   }
   if (recurrence.trigger === "end-of-season") {
-    return currentTurnIsEndOfSeason(gameState);
+    return currentCardIsEndOfSeason(gameState);
   }
 
   console.warn("unknown recurrence trigger");
@@ -98,7 +98,7 @@ const applyResourceRule = (
   rule: ResourceRule,
   gameState: GameState
 ) => {
-  console.log("applying resource rule");
+  console.log(`applying resource rule for ${cardId}`);
   const resources = { ...gameState.resources };
 
   if (!doesResourceCardApplyOnCurrentTurn(cardId, rule.recurrence, gameState)) {
@@ -158,11 +158,15 @@ const applyReplacementRule = (
   rule: ReplacementRule,
   gameState: GameState
 ) => {
+  console.log(`applying replacement rule for ${card.id}`);
   let newGameState = { ...gameState };
-  const cardTurn = turnForCard(card.id, gameState);
+  const cardTurn = slotForCard(card.id, gameState);
   const initialPlacement = scanTableauForCard(card.id, gameState);
 
-  if (cardTurn !== gameState.turn) {
+  if (cardTurn !== gameState.cardsPlayed) {
+    console.debug(
+      `replacement rule does not apply on turn ${cardTurn}, ${gameState.cardsPlayed}`
+    );
     return gameState;
   }
 
@@ -214,7 +218,7 @@ const applyReplacementRule = (
     ...newGameState,
     // this leaves you with one less card in the tableau
     // so we need another turn to fill it
-    turn: newGameState.turn - 1,
+    cardsPlayed: newGameState.cardsPlayed - 1,
     tableau: replaceInTableau,
   };
 };

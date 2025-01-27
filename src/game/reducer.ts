@@ -10,8 +10,8 @@ import type { QueueAugmentedState } from "../types/engine.types";
 import { drawCards } from "./deck";
 import { applyAllTurnEndRulesOnTableau } from "./ruleEngine";
 import {
-  currentTurnIndex,
-  currentTurnSeason,
+  currentCardSeason,
+  currentCardSeasonIndex,
   getCurrentDeck,
 } from "./selectors";
 
@@ -40,7 +40,10 @@ const draftCards = (
 ): QueueAugmentedState => {
   const deck = getCurrentDeck(state);
   const seasonDeck = state.decks[deck];
-  const drawCount = state.gameConfiguration.cardsDrawnPerTurn;
+  const drawCount =
+    state.cardsPlayed === 0
+      ? state.gameConfiguration.cardsDrawnOnFirstTurn
+      : state.gameConfiguration.cardsDrawnPerTurn;
   const { drawn: faceCardIds, deck: updatedDeck } = drawCards(
     seasonDeck,
     drawCount
@@ -63,25 +66,24 @@ const selectCard = (
   state: QueueAugmentedState,
   { cardId }: Select
 ): QueueAugmentedState => {
-  // TODO card needs to be paid for
-
   const updated = { ...state };
 
-  const currentSeason = currentTurnSeason(state);
-  const currentTurnIndx = currentTurnIndex(state);
+  const currentSeason = currentCardSeason(state);
+  const currentSeasonIndex = currentCardSeasonIndex(state);
 
   const toDiscard: CardId[] = state.faceCardIds
     .filter((id) => id !== cardId)
     .filter((id) => id !== "empty");
 
   const updatedSeason = [
-    ...state.tableau[currentSeason].slice(0, currentTurnIndx),
+    ...state.tableau[currentSeason].slice(0, currentSeasonIndex),
     cardId,
-    ...state.tableau[currentSeason].slice(currentTurnIndx + 1),
+    ...state.tableau[currentSeason].slice(currentSeasonIndex + 1),
   ];
 
   return {
     ...updated,
+    cardsPlayed: state.cardsPlayed + 1,
     faceCardIds: Array(state.gameConfiguration.cardsDrawnPerTurn).fill("empty"),
     tableau: {
       ...state.tableau,
@@ -114,6 +116,13 @@ const incrementTurn = (
   state: QueueAugmentedState,
   action: IncrementTurn
 ): QueueAugmentedState => {
+  if (state.cardsPlayed >= 16) {
+    return {
+      ...state,
+      state: "finished",
+    };
+  }
+
   return {
     ...state,
     turn: state.turn + 1,
@@ -124,6 +133,10 @@ export const gameEngineReducer = (
   state: QueueAugmentedState,
   action: GameAction
 ): QueueAugmentedState => {
+  if (state.state === "finished") {
+    return state;
+  }
+
   const popCurrentActionFromQueue =
     state.queue.length > 0
       ? state.queue[0].type === action.type

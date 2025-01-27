@@ -130,7 +130,15 @@ export const describeScoringRule = (rule: ScoringRule): string => {
 };
 
 export const describeDraftCostRule = (rule: DraftCostRule): string => {
-  return "draft cost rule";
+  // [resource descriptor] [for [tags]] in [seasons]
+
+  const resource = resourceDescriptors(rule.resources).join(",");
+
+  const tags = rule.tags.length > 0 ? `for [${rule.tags.join(", ")}]` : "";
+
+  const seasons = rule.seasons ? `in ${rule.seasons.join(", ")}` : "";
+
+  return `${resource} ${tags} ${seasons}`;
 };
 
 export const describeRule = (rule: Rule): string => {

@@ -1,6 +1,16 @@
-import { Card, Season, Tags } from "../types";
+import { Card, ResourceRule, Season, Tags } from "../types";
 
 // beginnings cards are special spring cards
+
+const baseResourceRule = (
+  time: number,
+  money: number,
+  influence: number
+): ResourceRule => ({
+  type: "resources",
+  resources: { money, influence, time },
+  recurrence: "once",
+});
 
 const BEGINNINGS_CARDS: Omit<Card, "id">[] = [
   {
@@ -8,15 +18,7 @@ const BEGINNINGS_CARDS: Omit<Card, "id">[] = [
     season: Season.Spring,
     tags: [Tags.wealth, Tags.family],
     rules: [
-      {
-        type: "resources",
-        resources: {
-          money: 2,
-          influence: 1,
-        },
-        recurrence: "once",
-      },
-
+      baseResourceRule(1, 3, 2),
       {
         type: "resources",
         resources: {
@@ -35,12 +37,20 @@ const BEGINNINGS_CARDS: Omit<Card, "id">[] = [
     season: Season.Spring,
     tags: [Tags.family, Tags.health],
     rules: [
+      baseResourceRule(2, 1, 0),
       {
-        type: "resources",
+        type: "draft-cost",
+        tags: [Tags.love],
         resources: {
-          money: 1,
+          time: 1,
         },
-        recurrence: "once",
+      },
+      {
+        type: "draft-cost",
+        tags: [Tags.family],
+        resources: {
+          time: -1,
+        },
       },
     ],
   },
@@ -49,12 +59,21 @@ const BEGINNINGS_CARDS: Omit<Card, "id">[] = [
     season: Season.Spring,
     tags: [Tags.discipline, Tags.career],
     rules: [
+      baseResourceRule(1, 2, 1),
       {
-        type: "resources",
+        type: "draft-cost",
+        tags: [Tags.friend, Tags.creative],
         resources: {
-          money: 1,
+          time: 1,
         },
-        recurrence: "once",
+      },
+      {
+        type: "draft-cost",
+        tags: [Tags.career, Tags.discipline],
+        seasons: [Season.Spring, Season.Summer],
+        resources: {
+          time: -1,
+        },
       },
     ],
   },
@@ -62,31 +81,131 @@ const BEGINNINGS_CARDS: Omit<Card, "id">[] = [
     name: "Military Brat",
     season: Season.Spring,
     tags: [Tags.discipline, Tags.travel],
-    rules: [],
+    rules: [
+      baseResourceRule(1, 1, 2),
+      {
+        type: "draft-cost",
+        tags: [Tags.friend, Tags.community],
+        seasons: [Season.Spring, Season.Summer],
+        resources: {
+          time: 1,
+        },
+      },
+      {
+        type: "draft-cost",
+        tags: [Tags.travel, Tags.career, Tags.discipline],
+        resources: {
+          time: -1,
+        },
+      },
+    ],
   },
   {
     name: "Religious Upbringing",
     season: Season.Spring,
     tags: [Tags.faith, Tags.community],
-    rules: [],
+    rules: [
+      baseResourceRule(1, 1, 2),
+      {
+        type: "draft-cost",
+        tags: [Tags.faith, Tags.community],
+        resources: {
+          time: -1,
+          money: -1,
+        },
+      },
+    ],
   },
   {
     name: "Struggling Family",
     season: Season.Spring,
     tags: [Tags.family],
-    rules: [],
+    rules: [baseResourceRule(-1, 0, 0)],
   },
   {
     name: "Single Parent",
     season: Season.Spring,
     tags: [Tags.family],
-    rules: [],
+    rules: [
+      baseResourceRule(0, -1, 0),
+      {
+        type: "draft-cost",
+        tags: [Tags.confidence],
+        resources: {
+          time: -1,
+        },
+      },
+    ],
   },
   {
     name: "Older Siblings",
     season: Season.Spring,
     tags: [Tags.family],
     rules: [
+      baseResourceRule(1, 1, 0),
+      {
+        type: "resources",
+        resources: {
+          time: 1,
+        },
+        recurrence: {
+          seasons: [Season.Spring, Season.Summer],
+          trigger: "end-of-season",
+        },
+      },
+    ],
+  },
+  {
+    name: "Small Town Life",
+    season: Season.Spring,
+    tags: [Tags.community, Tags.sunshine],
+    rules: [
+      baseResourceRule(1, 0, 0),
+      {
+        type: "draft-cost",
+        tags: [Tags.community],
+        resources: {
+          time: -1,
+        },
+      },
+    ],
+  },
+  {
+    name: "Farm Kid",
+    season: Season.Spring,
+    tags: [Tags.sunshine, Tags.discipline],
+    rules: [
+      baseResourceRule(1, 1, 0),
+      {
+        type: "draft-cost",
+        tags: [Tags.sunshine],
+        resources: {
+          time: -1,
+        },
+      },
+    ],
+  },
+  {
+    name: "Urban Elite",
+    season: Season.Spring,
+    tags: [Tags.family, Tags.education],
+    rules: [
+      baseResourceRule(1, 2, 1),
+      {
+        type: "draft-cost",
+        tags: [Tags.wealth, Tags.education],
+        resources: {
+          time: -1,
+        },
+      },
+    ],
+  },
+  {
+    name: "Eldest Child",
+    season: Season.Spring,
+    tags: [Tags.family],
+    rules: [
+      baseResourceRule(1, 0, 1),
       {
         type: "resources",
         resources: {
@@ -108,52 +227,55 @@ const BEGINNINGS_CARDS: Omit<Card, "id">[] = [
     ],
   },
   {
-    name: "Small Town Life",
-    season: Season.Spring,
-    tags: [Tags.community, Tags.sunshine],
-    rules: [],
-  },
-  {
-    name: "Farm Kid",
-    season: Season.Spring,
-    tags: [Tags.sunshine, Tags.discipline],
-    rules: [],
-  },
-  {
-    name: "Urban Elite",
-    season: Season.Spring,
-    tags: [Tags.family, Tags.education],
-    rules: [],
-  },
-  {
-    name: "Eldest Child",
-    season: Season.Spring,
-    tags: [Tags.family],
-    rules: [],
-  },
-  {
     name: "Child of Immigrants",
     season: Season.Spring,
     tags: [Tags.family, Tags.community],
-    rules: [],
+    rules: [
+      baseResourceRule(1, 1, 1),
+      {
+        type: "draft-cost",
+        tags: [Tags.community],
+        resources: {
+          time: -1,
+        },
+      },
+    ],
   },
   {
     name: "Orphan",
     season: Season.Spring,
     tags: [Tags.tragedy],
-    rules: [],
+    rules: [
+      baseResourceRule(-1, 0, 0),
+      {
+        type: "draft-cost",
+        tags: [Tags.family],
+        resources: {
+          time: 1,
+        },
+      },
+    ],
   },
   {
     name: "Only Child",
     season: Season.Spring,
     tags: [Tags.family],
-    rules: [],
+    rules: [
+      baseResourceRule(2, 1, 0),
+      {
+        type: "draft-cost",
+        tags: [Tags.friend],
+        resources: {
+          time: 1,
+        },
+      },
+    ],
   },
   {
     name: "Twin",
     season: Season.Spring,
     tags: [Tags.family, Tags.friend],
-    rules: [],
+    rules: [baseResourceRule(1, 1, 0)],
   },
 ];
 

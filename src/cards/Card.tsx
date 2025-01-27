@@ -27,13 +27,10 @@ export function CardTags({ card: { tags } }: CardDisplayProps) {
 
 export const CardRules = ({ card }: CardDisplayProps) => {
   return (
-    <div className="flex flex-shrink h-full text-sm">
+    <div className="flex flex-shrink h-full text-xs">
       <div className="flex flex-col gap-1">
         {card.rules.map((rule, index) => (
-          <span
-            className="hover:bg-slate-200 p-1 rounded select-none"
-            key={index}
-          >
+          <span className="hover:bg-slate-200 rounded select-none" key={index}>
             {describeRule(rule)}
           </span>
         ))}

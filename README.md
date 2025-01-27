@@ -13,14 +13,11 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 
 ### To Do
 
-- foundation: game end
 - foundation: design rules for all basic cards
-- foundation: decouple current turn from next spot in tableau
-  - e.g., replacement card should increment turn but not break placement rules
-- bug: fix recurring resource rules 
-  - (repro steps: older sibling, two matches in spring)
+- foundation: scoring
+- foundation: resource exchange
+- foundation: wildcard resource costs(?)
 - mechanic: cards that change draft cost
-- mechanic: scoring
 - mechanic: mistakes
 - mechanic: fate dice
 - ui: rule description for cost
@@ -28,6 +25,7 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 - ui: rule description for draft-cost
 - ui: polish
 - ui: card art
+- ui: make game end more 'fun'
 - gamedev: play testing and refinement
 
 ### In progress
@@ -39,6 +37,7 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 
 ### Done
 
+- foundation: game end
 - ui: basic WIP display
 - ui: start rule description system
 - foundation: design and implement recurring rules
@@ -46,3 +45,8 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 - bug: fix replacement rule mechanic
 - foundation: wire in rule engine
 - mechanic: beginnings deck
+- bug: fix recurring resource rules 
+  - (repro steps: older sibling, two matches in spring)
+- foundation: decouple current turn from next spot in tableau
+  - e.g., replacement card should increment turn but not break placement rules
+- foundation: base cost, card cost rules, and draft cost rules

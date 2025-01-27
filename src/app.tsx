@@ -2,19 +2,20 @@ import classNames from "classnames";
 import "./app.css";
 import { Card, Deck, EmptyCard } from "./cards/Card";
 import { useGameQueue } from "./game/engine";
-import { Season, GameState } from "./types";
+import { Season, GameState, CardId, ResourcePool } from "./types";
 import {
   seasonBgLightStyles,
   seasonShadowSubtleStyles,
   seasonTextStyles,
 } from "./utils/seasonStyles";
 import { getShuffledDecks } from "./cards/definitions";
-import { useEffect } from "preact/hooks";
+import { useEffect, useMemo } from "preact/hooks";
 import { getCurrentDeck } from "./game/selectors";
-
-const _capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+import { initDebugTools } from "./debug";
+import { _capitalize } from "./util";
 
 const EMPTY_GAME_STATE: GameState = {
+  cardsPlayed: 0,
   turn: 0,
   tableau: {
     [Season.Spring]: ["empty", "empty", "empty", "empty"],
@@ -23,8 +24,8 @@ const EMPTY_GAME_STATE: GameState = {
     [Season.Winter]: ["empty", "empty", "empty", "empty"],
   },
   resources: {
+    time: 3,
     money: 0,
-    time: 4,
     influence: 0,
   },
   decks: getShuffledDecks(),
@@ -32,7 +33,9 @@ const EMPTY_GAME_STATE: GameState = {
   faceCardIds: ["empty", "empty", "empty"],
   gameConfiguration: {
     cardsDrawnPerTurn: 3,
+    cardsDrawnOnFirstTurn: 2,
   },
+  state: "playing",
 };
 
 export const SimpleTableau = ({ tableau }: GameState) => {
@@ -60,21 +63,72 @@ export const SimpleTableau = ({ tableau }: GameState) => {
   );
 };
 
+const DraftCard = ({
+  cardId,
+  onClick,
+}: {
+  cardId: CardId | "empty";
+  onClick: () => void;
+}) => {
+  return cardId === "empty" ? (
+    <EmptyCard />
+  ) : (
+    <Card cardId={cardId} onClick={onClick} />
+  );
+};
+
+const CardCost = ({ time, money, influence }: ResourcePool) => {
+  return (
+    <div className="flex text-sm w-100 gap-3">
+      <span>🕐 {time}</span>
+      <span>💰 {money}</span>
+      <span>🗣️ {influence}</span>
+    </div>
+  );
+};
+
 export function App() {
   const { state, dispatch } = useGameQueue(EMPTY_GAME_STATE, { delayMs: 0 });
   const displayTurn = state.turn + 1;
-  const resourcesAndScore = {
-    Time: state.resources.time,
-    Money: state.resources.money,
-    Influence: state.resources.influence,
-    Treasures: 0,
-    Regrets: 0,
+
+  const { treasures, regrets } = useMemo(() => {
+    return { treasures: 0, regrets: 0 };
+  }, [state]);
+
+  const readout = {
+    "🕐": state.resources.time,
+    "💰": state.resources.money,
+    "🗣️": state.resources.influence,
+    Treasures: treasures,
+    Regrets: regrets,
     Turn: displayTurn,
+    "Cards Played": state.cardsPlayed,
+    State: state.state === "playing" ? "▶️" : "⏹️",
   };
 
   useEffect(() => {
     dispatch({ type: "draft" });
   }, []);
+
+  useEffect(() => {
+    initDebugTools({
+      playCard: (cardId: number) => {
+        dispatch({ type: "select", cardId });
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    if (state.state === "finished") {
+      const summary = `In your final hours, you evaluated your life as follows:
+      Treasures: ${treasures}
+      Regrets: ${regrets}
+      Score: ${treasures - regrets}
+      `;
+
+      alert("You're Dead!\n" + summary);
+    }
+  }, [state.state]);
 
   const currentDeck = getCurrentDeck(state);
 
@@ -84,24 +138,27 @@ export function App() {
         <SimpleTableau {...state} />
 
         <div className="flex gap-3 bg-gray-200 p-2 rounded-md mt-2">
-          <Deck variant={"discard"} label="Discard" />
+          <Deck
+            variant={"discard"}
+            label={`Discard (${state.discard.length})`}
+          />
           <Deck
             variant={currentDeck}
             label={`Deck of ${_capitalize(currentDeck)}`}
           />
-          {state.faceCardIds.map((cardId) =>
-            cardId === "empty" ? (
-              <EmptyCard />
-            ) : (
-              <Card
+          {state.faceCardIds.map((cardId) => (
+            <div className="flex flex-col gap-2 justify-center items-center">
+              <DraftCard
                 cardId={cardId}
-                onClick={() => dispatch({ type: "select", cardId })}
+                onClick={() => {
+                  dispatch({ type: "select", cardId });
+                }}
               />
-            )
-          )}
-
-          <div className="flex flex-col gap-2 px-4">
-            {Object.entries(resourcesAndScore).map(([key, value]) => (
+              <CardCost time={1} money={1} influence={1} />
+            </div>
+          ))}
+          <div className="flex flex-wrap gap-2 px-4 text-sm w-40">
+            {Object.entries(readout).map(([key, value]) => (
               <div>
                 <span className="font-semibold me-1">{key}:</span>
                 {value}
