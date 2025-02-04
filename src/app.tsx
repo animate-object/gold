@@ -2,17 +2,18 @@ import classNames from "classnames";
 import "./app.css";
 import { Card, Deck, EmptyCard } from "./cards/Card";
 import { useGameQueue } from "./game/engine";
-import { Season, GameState, CardId, ResourcePool } from "./types";
+import { Season, GameState, CardId } from "./types";
 import {
   seasonBgLightStyles,
   seasonShadowSubtleStyles,
   seasonTextStyles,
 } from "./utils/seasonStyles";
 import { getShuffledDecks } from "./cards/definitions";
-import { useEffect, useMemo } from "preact/hooks";
+import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { getCurrentDeck } from "./game/selectors";
 import { initDebugTools } from "./debug";
 import { _capitalize } from "./util";
+import { canPurchaseCard, computeCost } from "./game/cost";
 
 const EMPTY_GAME_STATE: GameState = {
   cardsPlayed: 0,
@@ -24,9 +25,9 @@ const EMPTY_GAME_STATE: GameState = {
     [Season.Winter]: ["empty", "empty", "empty", "empty"],
   },
   resources: {
-    time: 3,
-    money: 0,
-    influence: 0,
+    time: 2,
+    money: 1,
+    influence: 1,
   },
   decks: getShuffledDecks(),
   discard: [],
@@ -34,6 +35,8 @@ const EMPTY_GAME_STATE: GameState = {
   gameConfiguration: {
     cardsDrawnPerTurn: 3,
     cardsDrawnOnFirstTurn: 2,
+    allowNegativeResources: true,
+    timeAtStartOfSeason: 3,
   },
   state: "playing",
 };
@@ -77,7 +80,18 @@ const DraftCard = ({
   );
 };
 
-const CardCost = ({ time, money, influence }: ResourcePool) => {
+const CardCost = ({
+  gameState,
+  cardId,
+}: {
+  gameState: GameState;
+  cardId: CardId;
+}) => {
+  const { time, money, influence } = useMemo(
+    () => computeCost(cardId, gameState) ?? { time: 0, money: 0, influence: 0 },
+    [cardId, gameState]
+  );
+
   return (
     <div className="flex text-sm w-100 gap-3">
       <span>🕐 {time}</span>
@@ -132,6 +146,26 @@ export function App() {
 
   const currentDeck = getCurrentDeck(state);
 
+  const handleSelectCardToDraft = useCallback(
+    (cardId: CardId | "empty") => {
+      if (cardId === "empty") {
+        console.warn("Empty card slot selected");
+        return;
+      }
+      if (state.gameConfiguration.allowNegativeResources) {
+        console.info("Playing card", cardId);
+        dispatch({ type: "select", cardId });
+      } else {
+        if (canPurchaseCard(cardId, state)) {
+          dispatch({ type: "select", cardId });
+        } else {
+          alert("You can't afford that card!");
+        }
+      }
+    },
+    [state]
+  );
+
   return (
     <div className="bg-slate-50 h-screen w-full m-0 absolute top-0">
       <div className="p-2 flex flex-wrap">
@@ -150,20 +184,43 @@ export function App() {
             <div className="flex flex-col gap-2 justify-center items-center">
               <DraftCard
                 cardId={cardId}
-                onClick={() => {
-                  dispatch({ type: "select", cardId });
-                }}
+                onClick={() => handleSelectCardToDraft(cardId)}
               />
-              <CardCost time={1} money={1} influence={1} />
+              {cardId !== "empty" && (
+                <CardCost gameState={state} cardId={cardId} />
+              )}
             </div>
           ))}
-          <div className="flex flex-wrap gap-2 px-4 text-sm w-40">
+          <div className="flex flex-wrap gap-2 px-4 text-sm w-44">
             {Object.entries(readout).map(([key, value]) => (
               <div>
                 <span className="font-semibold me-1">{key}:</span>
                 {value}
               </div>
             ))}
+            <div class="flex text-xs">
+              <button
+                onClick={() =>
+                  dispatch({ type: "tradeResources", tradeType: "buyTime" })
+                }
+                disabled={state.resources.money < 2}
+                class="bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-1 rounded-l"
+              >
+                Buy 🕑 2:1
+              </button>
+              <button
+                onClick={() =>
+                  dispatch({
+                    type: "tradeResources",
+                    tradeType: "buyInfluence",
+                  })
+                }
+                disabled={state.resources.money < 2}
+                class="bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-2 rounded-r"
+              >
+                Buy 🗣️ 2:1
+              </button>
+            </div>
           </div>
         </div>
       </div>

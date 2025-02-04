@@ -4,7 +4,8 @@ export type GameActionType =
   | "draft"
   | "select"
   | "applyEndTurnRules"
-  | "incrementTurn";
+  | "incrementTurn"
+  | "tradeResources";
 
 export type GameActionBase = {
   type: GameActionType;
@@ -27,9 +28,14 @@ export interface IncrementTurn extends GameActionBase {
   type: "incrementTurn";
 }
 
+export interface TradeResources extends GameActionBase {
+  type: "tradeResources";
+  tradeType: "buyTime" | "buyInfluence";
+}
+
 export type GameAction =
   | Draft
   | Select
-  | Place
+  | TradeResources
   | ApplyEndTurnRules
   | IncrementTurn;

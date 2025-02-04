@@ -5,11 +5,14 @@ import type {
   GameAction,
   IncrementTurn,
   Select,
+  TradeResources,
 } from "../types/action.types";
 import type { QueueAugmentedState } from "../types/engine.types";
+import { canPurchaseCard, payForCard } from "./cost";
 import { drawCards } from "./deck";
 import { applyAllTurnEndRulesOnTableau } from "./ruleEngine";
 import {
+  currentCardIsEndOfSeason,
   currentCardSeason,
   currentCardSeasonIndex,
   getCurrentDeck,
@@ -68,6 +71,14 @@ const selectCard = (
 ): QueueAugmentedState => {
   const updated = { ...state };
 
+  if (
+    !state.gameConfiguration.allowNegativeResources &&
+    !canPurchaseCard(cardId, state)
+  ) {
+    console.warn("Not enough resources to purchase card", cardId);
+    return updated;
+  }
+
   const currentSeason = currentCardSeason(state);
   const currentSeasonIndex = currentCardSeasonIndex(state);
 
@@ -81,7 +92,20 @@ const selectCard = (
     ...state.tableau[currentSeason].slice(currentSeasonIndex + 1),
   ];
 
-  return {
+  const updatedQueue: GameAction[] = [
+    ...state.queue,
+    {
+      type: "applyEndTurnRules",
+    },
+    {
+      type: "incrementTurn",
+    },
+    {
+      type: "draft",
+    },
+  ];
+
+  const withUpdatedTableau = {
     ...updated,
     cardsPlayed: state.cardsPlayed + 1,
     faceCardIds: Array(state.gameConfiguration.cardsDrawnPerTurn).fill("empty"),
@@ -90,18 +114,11 @@ const selectCard = (
       [currentSeason]: updatedSeason,
     },
     discard: [...state.discard, ...toDiscard],
-    queue: [
-      ...state.queue,
-      {
-        type: "applyEndTurnRules",
-      },
-      {
-        type: "incrementTurn",
-      },
-      {
-        type: "draft",
-      },
-    ],
+  };
+
+  return {
+    ...payForCard(cardId, withUpdatedTableau),
+    queue: updatedQueue,
   };
 };
 
@@ -109,7 +126,24 @@ const applyEndTurnRules = (
   state: QueueAugmentedState,
   _: ApplyEndTurnRules
 ): QueueAugmentedState => {
-  return applyAllTurnEndRulesOnTableau(state) as QueueAugmentedState;
+  const afterRules = applyAllTurnEndRulesOnTableau(
+    state
+  ) as QueueAugmentedState;
+
+  if (currentCardIsEndOfSeason(afterRules)) {
+    console.log("end of season, applying time bonus");
+    return {
+      ...afterRules,
+      resources: {
+        ...afterRules.resources,
+        time:
+          afterRules.resources.time +
+          afterRules.gameConfiguration.timeAtStartOfSeason,
+      },
+    };
+  } else {
+    return afterRules;
+  }
 };
 
 const incrementTurn = (
@@ -126,6 +160,32 @@ const incrementTurn = (
   return {
     ...state,
     turn: state.turn + 1,
+  };
+};
+
+const tradeResources = (
+  state: QueueAugmentedState,
+  action: TradeResources
+): QueueAugmentedState => {
+  if (state.resources.money < 2) {
+    console.warn("Not enough money to trade");
+    return state;
+  }
+
+  // you can buy time at 2:1 or influence at 2:1
+  const { resources } = state;
+
+  return {
+    ...state,
+    resources: {
+      money: resources.money - 2,
+      time:
+        action.tradeType === "buyTime" ? resources.time + 1 : resources.time,
+      influence:
+        action.tradeType === "buyInfluence"
+          ? resources.influence + 1
+          : resources.influence,
+    },
   };
 };
 
@@ -158,6 +218,9 @@ export const gameEngineReducer = (
       break;
     case "incrementTurn":
       updated = incrementTurn(updated, action);
+      break;
+    case "tradeResources":
+      updated = tradeResources(updated, action);
       break;
     default:
       console.warn("Unhandled action", action);

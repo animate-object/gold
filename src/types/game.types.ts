@@ -18,6 +18,12 @@ type CardSlot = CardId | EmptySlot;
 interface ConfigOptions {
   cardsDrawnPerTurn: number;
   cardsDrawnOnFirstTurn: number;
+  // should be false for real games
+  // but useful in development
+  allowNegativeResources: boolean;
+  // time alotted at the start of each
+  // season (not including spring)
+  timeAtStartOfSeason: number;
 }
 
 export interface GameState {

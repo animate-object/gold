@@ -93,10 +93,24 @@ const computeApplicableDraftCosts = (
   );
 };
 
-export const computeCost = (
+export const neverLessThanZero = (number: number) => Math.max(0, number);
+
+export const resourceCostMinimums = (cost: ResourcePool): ResourcePool => {
+  return {
+    time: neverLessThanZero(cost.time),
+    money: neverLessThanZero(cost.money),
+    influence: neverLessThanZero(cost.influence),
+  };
+};
+
+export const _computeCost = (
   cardId: CardId,
   gameState: GameState
 ): ResourcePool | undefined => {
+  if (getCard(cardId).beginningCard) {
+    return { time: 0, money: 0, influence: 0 };
+  }
+
   const slotBaseCost = computeSlotBaseCost(cardId, gameState);
   if (slotBaseCost === undefined) {
     return undefined;
@@ -109,7 +123,7 @@ export const computeCost = (
 
   const draftCost = computeApplicableDraftCosts(cardId, gameState);
 
-  return [slotBaseCost, cardBaseCost, draftCost].reduce(
+  const computedCost = [slotBaseCost, cardBaseCost, draftCost].reduce(
     (acc, cost) => {
       acc.time += cost.time;
       acc.money += cost.money;
@@ -119,4 +133,40 @@ export const computeCost = (
     },
     { time: 0, money: 0, influence: 0 }
   );
+
+  return resourceCostMinimums(computedCost);
+};
+
+export const computeCost = memoize(_computeCost);
+
+export const canPurchaseCard = (
+  cardId: CardId,
+  gameState: GameState
+): boolean => {
+  const cost = computeCost(cardId, gameState);
+  if (cost === undefined) {
+    return false;
+  }
+
+  return (
+    gameState.resources.time >= cost.time &&
+    gameState.resources.money >= cost.money &&
+    gameState.resources.influence >= cost.influence
+  );
+};
+
+export const payForCard = (cardId: CardId, gameState: GameState): GameState => {
+  const cost = computeCost(cardId, gameState);
+  if (cost === undefined) {
+    return gameState;
+  }
+
+  return {
+    ...gameState,
+    resources: {
+      time: gameState.resources.time - cost.time,
+      money: gameState.resources.money - cost.money,
+      influence: gameState.resources.influence - cost.influence,
+    },
+  };
 };

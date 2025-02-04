@@ -17,7 +17,7 @@ export const currentCardSeason = (gameState: GameState): Season => {
 };
 
 export const currentCardIsEndOfSeason = (gameState: GameState): boolean => {
-  return gameState.cardsPlayed % 4 === 3;
+  return gameState.cardsPlayed % 4 === 0;
 };
 
 export const getCurrentDeck = (gameState: GameState): Decks => {

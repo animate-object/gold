@@ -14,15 +14,14 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 ### To Do
 
 - foundation: design rules for all basic cards
-- foundation: scoring
-- foundation: resource exchange
-- foundation: wildcard resource costs(?)
-- mechanic: cards that change draft cost
-- mechanic: mistakes
+  - in spring
+  - in summer
+  - in fall
+  - in winter
+  - fortune deck
+- mechanic: mistakes/fortunes
 - mechanic: fate dice
-- ui: rule description for cost
-- ui: rule description for scoring
-- ui: rule description for draft-cost
+- mechanic: wildcard resource costs(?)
 - ui: polish
 - ui: card art
 - ui: make game end more 'fun'
@@ -30,10 +29,8 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 
 ### In progress
 
-- foundation: resources and card costs
-  - done when:
-    - playing card draws resources from pool
-    - we can detect when you can't buy a card
+- foundation: scoring
+- ui: rule description for scoring
 
 ### Done
 
@@ -50,3 +47,11 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 - foundation: decouple current turn from next spot in tableau
   - e.g., replacement card should increment turn but not break placement rules
 - foundation: base cost, card cost rules, and draft cost rules
+- foundation: resources and card costs
+  - done when:
+    - playing card draws resources from pool
+    - we can detect when you can't buy a card
+- foundation: resource exchange
+- mechanic: cards that change draft cost
+- ui: rule description for cost
+- ui: rule description for draft-cost
