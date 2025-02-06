@@ -90,7 +90,7 @@ export function seasonBgDeckStyles(season: Decks): string {
     case "beginnings":
       return "bg-purple-200";
     case "fortunes":
-      return "bg-red-200";
+      return "bg-pink-200";
   }
 }
 

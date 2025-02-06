@@ -5,7 +5,9 @@ export enum Season {
   Winter = "winter",
 }
 
-type SpecialDecks = "beginnings" | "fortunes";
+export type FortuneDecks = `fortunes${Capitalize<Season>}`;
+
+type SpecialDecks = "beginnings" | FortuneDecks;
 
 type DiscardPile = "discard";
 

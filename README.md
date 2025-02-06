@@ -55,3 +55,12 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 - ui: rule description for draft-cost
 - foundation: scoring
 - ui: rule description for scoring
+
+
+### Brainstorming
+
+
+Deck of fortunes
+
+When you run out of resources, you can draw for free from the deck of fortunes.
+

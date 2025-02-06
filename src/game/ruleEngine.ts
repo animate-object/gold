@@ -1,7 +1,7 @@
 import { getCard } from "../cards/store";
 import {
   currentCardIsEndOfSeason,
-  currentCardSeason,
+  getCurrentSeason,
   getAllCardsInOrderOfPlay,
   slotForCard,
 } from "./selectors";
@@ -75,7 +75,7 @@ const doesResourceCardApplyOnCurrentTurn = (
     return slotForCard(cardId, gameState) === gameState.cardsPlayed;
   }
 
-  const currentSeason = currentCardSeason(gameState);
+  const currentSeason = getCurrentSeason(gameState);
 
   if (recurrence.seasons && !recurrence.seasons?.includes(currentSeason)) {
     console.debug("resource rule does not apply in current season");

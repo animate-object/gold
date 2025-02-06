@@ -13,7 +13,7 @@ import { drawCards } from "./deck";
 import { applyAllTurnEndRulesOnTableau } from "./ruleEngine";
 import {
   currentCardIsEndOfSeason,
-  currentCardSeason,
+  getCurrentSeason,
   currentCardSeasonIndex,
   getCurrentDeck,
 } from "./selectors";
@@ -79,7 +79,7 @@ const selectCard = (
     return updated;
   }
 
-  const currentSeason = currentCardSeason(state);
+  const currentSeason = getCurrentSeason(state);
   const currentSeasonIndex = currentCardSeasonIndex(state);
 
   const toDiscard: CardId[] = state.faceCardIds

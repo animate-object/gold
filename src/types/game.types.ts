@@ -13,7 +13,7 @@ export interface Deck {
 }
 
 type EmptySlot = "empty";
-type CardSlot = CardId | EmptySlot;
+export type CardSlot = CardId | EmptySlot;
 
 interface ConfigOptions {
   cardsDrawnPerTurn: number;

@@ -105,3 +105,17 @@ export function Deck({
     </div>
   );
 }
+
+export const DraftCard = ({
+  cardId,
+  onClick,
+}: {
+  cardId: CardId | "empty";
+  onClick: () => void;
+}) => {
+  return cardId === "empty" ? (
+    <EmptyCard />
+  ) : (
+    <Card cardId={cardId} onClick={onClick} />
+  );
+};

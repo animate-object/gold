@@ -11,7 +11,7 @@ type Location = {
   slot: number;
 };
 
-export const currentCardSeason = (gameState: GameState): Season => {
+export const getCurrentSeason = (gameState: GameState): Season => {
   const turn = gameState.cardsPlayed;
   if (turn <= 3) return Season.Spring;
   if (turn <= 7) return Season.Summer;
@@ -25,12 +25,7 @@ export const currentCardIsEndOfSeason = (gameState: GameState): boolean => {
 
 export const getCurrentDeck = (gameState: GameState): Decks => {
   if (gameState.cardsPlayed === 0) return "beginnings";
-
-  // if all resources are depleted, return misfortune
-  const resources = Object.values(gameState.resources);
-  if (resources.every((resource) => resource === 0)) return "misfortune";
-
-  return currentCardSeason(gameState);
+  return getCurrentSeason(gameState);
 };
 
 export const currentCardSeasonIndex = (gameState: GameState): number => {
@@ -39,7 +34,7 @@ export const currentCardSeasonIndex = (gameState: GameState): number => {
 
 export const cardAtCurrentSlot = (gameState: GameState): CardId | undefined => {
   const slot =
-    gameState.tableau[currentCardSeason(gameState)][
+    gameState.tableau[getCurrentSeason(gameState)][
       currentCardSeasonIndex(gameState)
     ];
 
