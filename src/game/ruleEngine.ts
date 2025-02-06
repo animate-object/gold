@@ -19,6 +19,7 @@ import {
   TagMatchRules,
   ResourcePool,
 } from "../types";
+import { neverLessThanZero } from "../util";
 
 const countMatchingCards = (
   tagMatchRules: TagMatchRules,
@@ -252,8 +253,6 @@ export const applyAllTurnEndRulesOnTableau = (
     })
     .flat();
 
-  console.log(rulesAndCards);
-
   return rulesAndCards.reduce(
     (state, { rule, card }) => applyAllTurnEndRules(card, rule, state),
     gameState
@@ -267,20 +266,40 @@ export const applyAllTurnEndRulesOnTableau = (
  * do not mutate the game state merely take it as input
  */
 export const applyScoringRule = (
-  rule: Rule,
+  rule: ScoringRule,
   gameState: GameState,
   score: Score
 ): Score => {
-  return score;
+  if (!rule.match) {
+    return {
+      ...score,
+      [rule.variant]: score[rule.variant] + rule.amount,
+    };
+  }
+
+  const [_, matchCount] = countMatchingCards(rule.match, gameState);
+
+  return {
+    ...score,
+    [rule.variant]: score[rule.variant] + matchCount * rule.amount,
+  };
 };
 
-const applyAllScoringRules = (
+export const applyAllScoringRules = (
   rules: ScoringRule[],
   gameState: GameState,
-  score: Score
+  score: Score = {
+    treasures: 0,
+    regrets: 0,
+  }
 ): Score => {
-  return rules.reduce(
+  const computed = rules.reduce(
     (score, rule) => applyScoringRule(rule, gameState, score),
     score
   );
+
+  return {
+    treasures: neverLessThanZero(computed.treasures),
+    regrets: neverLessThanZero(computed.regrets),
+  };
 };

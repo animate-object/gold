@@ -23,7 +23,7 @@ const tagStyles: Record<Tags, string> = {
   career: "bg-sky-300 text-black shadow-md shadow-sky-500/50",
   education: "bg-violet-800 text-white shadow-md shadow-violet-500/50",
   // life tags
-  wealth: "bg-amber-500 text-white shadow-md shadow-amber-500/50",
+  finance: "bg-amber-500 text-white shadow-md shadow-amber-500/50",
   health: "bg-lime-400 text-black shadow-md shadow-lime-500/50",
   influence: "bg-indigo-700 text-white shadow-md shadow-indigo-500/50",
   confidence: "bg-cyan-800 text-white shadow-md shadow-cyan-500/50",

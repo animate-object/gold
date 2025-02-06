@@ -1,3 +1,4 @@
+import React, { ReactNode } from "preact/compat";
 import type {
   Rule,
   CostRule,
@@ -8,13 +9,14 @@ import type {
   ResourcePool,
   TagMatchRules,
 } from "../types";
+import { GameIcon } from "../components/GameIcon";
 
 type ResourceAmtDescriptor = (n: number) => string;
 
 const describeResource: Record<keyof ResourcePool, ResourceAmtDescriptor> = {
-  time: (n) => `${n} 🕐`,
-  money: (n) => `${n} 💰`,
-  influence: (n) => `${n} 🗣️`,
+  time: (n) => `${n} [time]`,
+  money: (n) => `${n} [money]`,
+  influence: (n) => `${n} [influence]`,
 };
 
 const signedNumber = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
@@ -23,16 +25,21 @@ const describeResourceChange: Record<
   keyof ResourcePool,
   ResourceAmtDescriptor
 > = {
-  time: (n) => `🕐 ${signedNumber(n)}`,
-  money: (n) => `💰 ${signedNumber(n)}`,
-  influence: (n) => `🗣️ ${signedNumber(n)}`,
+  time: (n) => `${signedNumber(n)} [time] `,
+  money: (n) => `${signedNumber(n)} [money] `,
+  influence: (n) => `${signedNumber(n)} [influence] `,
 };
 
 const resourceDescriptors = (
   resources: Partial<ResourcePool>,
-  variant: "base" | "change" = "base"
+  variant: "base" | "change" = "base",
+  includeZeros: boolean = false
 ): string[] => {
-  return Object.entries(resources).map(([resource, amt]) =>
+  const entries = Object.entries(resources);
+  const filteredEntries = !includeZeros
+    ? entries.filter(([, amt]) => amt !== 0)
+    : entries;
+  return filteredEntries.map(([resource, amt]) =>
     variant === "base"
       ? describeResource[resource as keyof ResourcePool](amt)
       : describeResourceChange[resource as keyof ResourcePool](amt)
@@ -40,7 +47,7 @@ const resourceDescriptors = (
 };
 
 export const describeCostRule = ({ resources }: CostRule): string => {
-  return resourceDescriptors(resources).join(" ・ ");
+  return `Cost:${resourceDescriptors(resources).join("・")}`;
 };
 
 export const describeRecurrence = ({
@@ -89,25 +96,26 @@ export const describeTagMatch = (
   const base = `${prefix} card`;
   const withPart = tagMatch.match === "none" ? "without" : "with";
   const joinOperator = tagMatch.match === "all" ? "and" : "or";
-  const joined = englishJoin(tagMatch.tags, joinOperator);
+  const joined = englishJoin(
+    tagMatch.tags.map((tag) => `[${tag}]`),
+    joinOperator
+  );
 
-  const ratio = tagMatch.ratio
-    ? `at ratio ${tagMatch.ratio.matches}:${tagMatch.ratio.value}`
-    : "";
+  const ratio = tagMatch.ratio ? `${describeRatio(tagMatch.ratio)}` : "";
 
   const seasons = tagMatch.seasons;
   const seasonPart = seasons ? `in ${seasons.join(", ")}` : "";
 
-  return `${base} ${withPart} [${joined}] ${seasonPart} ${ratio}`;
+  return `${base} ${withPart} ${joined} ${seasonPart} ${ratio}`;
 };
 
 export const describeResourceRule = (rule: ResourceRule): string => {
   // components of the phrase:
   // [when] [resource changes] [for [ratio] [matching [tags]]]
   // e.g.
-  // every turn, +1 🕐, +1 💰, +1 🗣️
-  // +1 💰 for every career tag
-  // end of spring, summer, -1 💰
+  // every turn, +1 [time], +1 [money], +1 [influence]
+  // +1 [money] for every career tag
+  // end of spring, summer, -1 [money]
 
   const when =
     rule.recurrence === "once" ? "" : `${describeRecurrence(rule.recurrence)} `;
@@ -118,30 +126,48 @@ export const describeResourceRule = (rule: ResourceRule): string => {
 
   const match = rule.match ? ` ${describeTagMatch(rule.match)}` : "";
 
-  return `${when}${resourceChange}${match}`;
+  return `Res:${when}${resourceChange}${match}`;
 };
 
 export const describeReplacementRule = (rule: ReplacementRule): string => {
-  return `Replaces ${describeTagMatch(rule.match, `${rule.index} card`)}`;
+  return `Swap:${describeTagMatch(rule.match, `${rule.index} card`)}`;
+};
+
+export const describeRatio = ({
+  matches,
+  value,
+}: {
+  matches: number;
+  value: number;
+}): string => {
+  return `${matches}:${value}`;
 };
 
 export const describeScoringRule = (rule: ScoringRule): string => {
-  return "scoring rule";
+  const matchPart = rule.match ? ` ${describeTagMatch(rule.match)}` : "";
+  return `Score:${rule.amount} ${rule.variant}${matchPart}`;
 };
 
 export const describeDraftCostRule = (rule: DraftCostRule): string => {
   // [resource descriptor] [for [tags]] in [seasons]
 
-  const resource = resourceDescriptors(rule.resources).join(",");
+  const resource = resourceDescriptors(rule.resources, "change").join(",");
 
-  const tags = rule.tags.length > 0 ? `for [${rule.tags.join(", ")}]` : "";
+  const tags =
+    rule.tags.length > 0
+      ? `for ${englishJoin(
+          rule.tags.map((tag) => `[${tag}]`),
+          "and",
+          ","
+        )}`
+      : "";
 
   const seasons = rule.seasons ? `in ${rule.seasons.join(", ")}` : "";
 
-  return `${resource} ${tags} ${seasons}`;
+  return `Pay:${resource} ${tags} ${seasons}`;
 };
 
-export const describeRule = (rule: Rule): string => {
+const ruleDescriptorString = (rule: Rule): string => {
   switch (rule.type) {
     case "cost":
       return describeCostRule(rule);
@@ -154,4 +180,49 @@ export const describeRule = (rule: Rule): string => {
     case "scoring":
       return describeScoringRule(rule);
   }
+};
+
+function parseRuleDescriptor(ruleDescriptor: string): string[] {
+  const regex = /(\[[^\]]+\])/g;
+  let result = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(ruleDescriptor)) !== null) {
+    if (match.index > lastIndex) {
+      result.push(ruleDescriptor.slice(lastIndex, match.index));
+    }
+    result.push(match[0]);
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < ruleDescriptor.length) {
+    result.push(ruleDescriptor.slice(lastIndex));
+  }
+
+  return result;
+}
+
+export const describeRule = (rules: Rule): ReactNode => {
+  const stringDescriptor = ruleDescriptorString(rules);
+
+  // split components by `[` and `]`
+
+  const components = parseRuleDescriptor(stringDescriptor);
+  // console.log(components);
+
+  console.log("components", components);
+
+  return (
+    <div className="flex flex-wrap gap-0.5">
+      {components.map((component) => {
+        if (component.startsWith("[")) {
+          return <GameIcon size="sm" tag={component.slice(1, -1) as any} />;
+        }
+        return component;
+      })}
+    </div>
+  );
+
+  // return stringDescriptor;
 };

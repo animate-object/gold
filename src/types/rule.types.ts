@@ -16,7 +16,7 @@ interface Recurring {
   seasons?: Season[];
 }
 
-type Recurrence = "once" | Recurring;
+export type Recurrence = "once" | Recurring;
 
 export interface TagMatchRules {
   tags: Tags[];
@@ -67,26 +67,15 @@ export interface ResourceRule {
   match?: TagMatchRules;
 }
 
-interface ScoreCondition {
-  negate: boolean;
-  seasons: Season[];
-  match: TagMatchRules;
-}
-
-interface ScoreDescriptor {
-  operation: "add" | "subtract";
-  conditions?: ScoreCondition[];
-  amount: number;
-}
-
 /**
  * Changes to `treasures` or `regrets`.
  * Score is computed each turn, but not finalized until the end of the game
  */
 export interface ScoringRule {
   type: "scoring";
-  treasure: ScoreDescriptor[];
-  regret: ScoreDescriptor[];
+  variant: "treasures" | "regrets";
+  amount: number;
+  match?: TagMatchRules;
 }
 
 /**

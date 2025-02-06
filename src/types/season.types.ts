@@ -5,7 +5,7 @@ export enum Season {
   Winter = "winter",
 }
 
-type SpecialDecks = "beginnings" | "misfortune";
+type SpecialDecks = "beginnings" | "fortunes";
 
 type DiscardPile = "discard";
 

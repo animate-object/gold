@@ -5,7 +5,7 @@ import {
   FALL_CARDS,
   WINTER_CARDS,
 } from "../data/cardData";
-import { Card, CardId, Deck, Decks, Season } from "../types";
+import { Card, CardId, Deck, Decks } from "../types";
 import { shuffle } from "../utils/array";
 
 export const allCards: Card[] = [

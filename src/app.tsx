@@ -10,10 +10,12 @@ import {
 } from "./utils/seasonStyles";
 import { getShuffledDecks } from "./cards/definitions";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
-import { getCurrentDeck } from "./game/selectors";
+import { computeScore, getCurrentDeck } from "./game/selectors";
 import { initDebugTools } from "./debug";
 import { _capitalize } from "./util";
 import { canPurchaseCard, computeCost } from "./game/cost";
+import { GameIcon, Resource } from "./components/GameIcon";
+import { Tooltip } from "./components/Tooltip";
 
 const EMPTY_GAME_STATE: GameState = {
   cardsPlayed: 0,
@@ -25,7 +27,7 @@ const EMPTY_GAME_STATE: GameState = {
     [Season.Winter]: ["empty", "empty", "empty", "empty"],
   },
   resources: {
-    time: 2,
+    time: 4,
     money: 1,
     influence: 1,
   },
@@ -52,8 +54,14 @@ export const SimpleTableau = ({ tableau }: GameState) => {
             seasonShadowSubtleStyles(season as Season)
           )}
         >
-          <h2 className={seasonTextStyles(season as Season)}>
-            {_capitalize(season)}
+          <h2
+            className={classNames(
+              seasonTextStyles(season as Season),
+              "flex gap-1 items-center"
+            )}
+          >
+            <div> {_capitalize(season)}</div>
+            <GameIcon tag={season as Season} />
           </h2>
           <div className="flex flex-wrap gap-3">
             {cards.map((cardId) =>
@@ -94,11 +102,31 @@ const CardCost = ({
 
   return (
     <div className="flex text-sm w-100 gap-3">
-      <span>🕐 {time}</span>
-      <span>💰 {money}</span>
-      <span>🗣️ {influence}</span>
+      <div className="inline-flex items-center gap-1">
+        <Resource.Time /> {time}
+      </div>
+      <div className="inline-flex items-center gap-1">
+        <Resource.Money /> {money}
+      </div>
+      <div className="inline-flex items-center gap-1">
+        <Resource.Influence /> {influence}
+      </div>
     </div>
   );
+};
+
+const READOUT_ICON_MAP = {
+  time: Resource.Time,
+  money: Resource.Money,
+  influence: Resource.Influence,
+};
+
+const getReadoutLabelForKey = (key: string): React.ReactNode => {
+  if (key in READOUT_ICON_MAP) {
+    const El = READOUT_ICON_MAP[key as keyof typeof READOUT_ICON_MAP];
+    return <El />;
+  }
+  return key;
 };
 
 export function App() {
@@ -106,13 +134,13 @@ export function App() {
   const displayTurn = state.turn + 1;
 
   const { treasures, regrets } = useMemo(() => {
-    return { treasures: 0, regrets: 0 };
+    return computeScore(state);
   }, [state]);
 
   const readout = {
-    "🕐": state.resources.time,
-    "💰": state.resources.money,
-    "🗣️": state.resources.influence,
+    time: state.resources.time,
+    money: state.resources.money,
+    influence: state.resources.influence,
     Treasures: treasures,
     Regrets: regrets,
     Turn: displayTurn,
@@ -193,33 +221,39 @@ export function App() {
           ))}
           <div className="flex flex-wrap gap-2 px-4 text-sm w-44">
             {Object.entries(readout).map(([key, value]) => (
-              <div>
-                <span className="font-semibold me-1">{key}:</span>
+              <div className="inline-flex items-center gap-1">
+                <span className="font-semibold me-1">
+                  {getReadoutLabelForKey(key)}
+                </span>
                 {value}
               </div>
             ))}
             <div class="flex text-xs">
-              <button
-                onClick={() =>
-                  dispatch({ type: "tradeResources", tradeType: "buyTime" })
-                }
-                disabled={state.resources.money < 2}
-                class="bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-1 rounded-l"
-              >
-                Buy 🕑 2:1
-              </button>
-              <button
-                onClick={() =>
-                  dispatch({
-                    type: "tradeResources",
-                    tradeType: "buyInfluence",
-                  })
-                }
-                disabled={state.resources.money < 2}
-                class="bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-2 rounded-r"
-              >
-                Buy 🗣️ 2:1
-              </button>
+              <Tooltip content="Buy Time">
+                <button
+                  onClick={() =>
+                    dispatch({ type: "tradeResources", tradeType: "buyTime" })
+                  }
+                  disabled={state.resources.money < 2}
+                  class="inline-flex gap-1 items-center bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-1 rounded-l"
+                >
+                  Buy <Resource.Time /> 2:1
+                </button>
+              </Tooltip>
+              <Tooltip content="Buy Influence">
+                <button
+                  onClick={() =>
+                    dispatch({
+                      type: "tradeResources",
+                      tradeType: "buyInfluence",
+                    })
+                  }
+                  disabled={state.resources.money < 2}
+                  class="inline-flex gap-1 items-center bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-2 rounded-r"
+                >
+                  Buy <Resource.Influence /> 2:1
+                </button>
+              </Tooltip>
             </div>
           </div>
         </div>

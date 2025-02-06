@@ -1,5 +1,8 @@
+import { memoize } from "lodash";
+import { getCard } from "../cards/store";
 import { Season } from "../types";
-import type { CardId, Decks, GameState } from "../types";
+import type { CardId, Decks, GameState, Rule, Score } from "../types";
+import { applyAllScoringRules } from "./ruleEngine";
 
 type Location = {
   // Spring, Summer, Fall, Winter
@@ -89,7 +92,36 @@ export const faceCardSlotForCard = (
   return idx;
 };
 
-export const getAllCardsInOrderOfPlay = (gameState: GameState): CardId[] => {
+const _getAllCardsInOrderOfPlay = (gameState: GameState): CardId[] => {
   const cards = Object.values(gameState.tableau).flat();
   return cards.filter((card) => card !== "empty");
 };
+
+export const getAllCardsInOrderOfPlay = memoize(_getAllCardsInOrderOfPlay);
+
+export const getAllRulesOnTableau = (gameState: GameState): Rule[] => {
+  const cards = getAllCardsInOrderOfPlay(gameState);
+  return cards
+    .map((card) => {
+      const cardData = getCard(card);
+      return cardData.rules;
+    })
+    .flat();
+};
+
+const _computeScore = (gameState: GameState): Score => {
+  return applyAllScoringRules(
+    getAllRulesOnTableau(gameState).filter((rule) => rule.type === "scoring"),
+    gameState
+  );
+};
+
+export const computeScore = memoize(_computeScore);
+
+export const _deckForCard = (cardId: CardId): Decks => {
+  const card = getCard(cardId);
+  if (card.beginningCard) return "beginnings";
+  return card.season;
+};
+
+export const deckForCard = memoize(_deckForCard);

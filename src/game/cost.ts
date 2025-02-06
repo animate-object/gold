@@ -1,5 +1,6 @@
 import { getCard } from "../cards/store";
 import { CardId, GameState, ResourcePool } from "../types";
+import { neverLessThanZero } from "../util";
 import { faceCardSlotForCard } from "./selectors";
 import { memoize } from "lodash";
 
@@ -92,8 +93,6 @@ const computeApplicableDraftCosts = (
     { time: 0, money: 0, influence: 0 }
   );
 };
-
-export const neverLessThanZero = (number: number) => Math.max(0, number);
 
 export const resourceCostMinimums = (cost: ResourcePool): ResourcePool => {
   return {

@@ -18,7 +18,7 @@ enum Tags {
   career = "career",
   education = "education",
   // life tags
-  wealth = "wealth",
+  finance = "finance",
   health = "health",
   influence = "influence",
   confidence = "confidence",

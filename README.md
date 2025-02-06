@@ -19,8 +19,6 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
   - in fall
   - in winter
   - fortune deck
-- mechanic: mistakes/fortunes
-- mechanic: fate dice
 - mechanic: wildcard resource costs(?)
 - ui: polish
 - ui: card art
@@ -29,8 +27,8 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 
 ### In progress
 
-- foundation: scoring
-- ui: rule description for scoring
+- mechanic: mistakes/fortunes
+- mechanic: fate dice
 
 ### Done
 
@@ -55,3 +53,5 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 - mechanic: cards that change draft cost
 - ui: rule description for cost
 - ui: rule description for draft-cost
+- foundation: scoring
+- ui: rule description for scoring

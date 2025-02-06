@@ -89,7 +89,7 @@ export function seasonBgDeckStyles(season: Decks): string {
       return "bg-blue-200";
     case "beginnings":
       return "bg-purple-200";
-    case "misfortune":
+    case "fortunes":
       return "bg-red-200";
   }
 }
@@ -119,7 +119,7 @@ export function seasonShadowStyles(season: Decks): string {
       return "shadow-md shadow-blue-500/50";
     case "beginnings":
       return "shadow-md shadow-purple-300/50";
-    case "misfortune":
+    case "fortunes":
       return "shadow-md shadow-red-300/50";
   }
 }
