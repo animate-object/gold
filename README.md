@@ -64,3 +64,14 @@ Deck of fortunes
 
 When you run out of resources, you can draw for free from the deck of fortunes.
 
+
+Fate dice
+
+At the end of every season, and when triggered by certain cards, 'fate dice' are rolled
+
+The most likely outcomes are relatively innocuous, gaining or losing a few resources
+
+Some die rolls force you to play one card from the fortunes deck
+
+Finally, as seasons progress, there is a slight but increasing chance to meet an untimely death
+

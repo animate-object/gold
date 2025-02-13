@@ -1,7 +1,14 @@
 import { memoize } from "lodash";
 import { getCard } from "../cards/store";
 import { Season } from "../types";
-import type { CardId, Decks, GameState, Rule, Score } from "../types";
+import type {
+  CardId,
+  Decks,
+  FortuneDecks,
+  GameState,
+  Rule,
+  Score,
+} from "../types";
 import { applyAllScoringRules } from "./ruleEngine";
 
 type Location = {
@@ -23,9 +30,23 @@ export const currentCardIsEndOfSeason = (gameState: GameState): boolean => {
   return gameState.cardsPlayed % 4 === 0;
 };
 
+export const nextCardIsEndOfSeason = (gameState: GameState): boolean => {
+  if (getCurrentSeason(gameState) === Season.Winter) return false;
+
+  return (gameState.cardsPlayed + 1) % 4 === 0;
+};
+
 export const getCurrentDeck = (gameState: GameState): Decks => {
   if (gameState.cardsPlayed === 0) return "beginnings";
   return getCurrentSeason(gameState);
+};
+
+export const getCurrentFortuneDeck = (gameState: GameState): FortuneDecks => {
+  const season = getCurrentSeason(gameState);
+  if (season === Season.Spring) return "fortunesSpring";
+  if (season === Season.Summer) return "fortunesSummer";
+  if (season === Season.Fall) return "fortunesFall";
+  return "fortunesWinter";
 };
 
 export const currentCardSeasonIndex = (gameState: GameState): number => {

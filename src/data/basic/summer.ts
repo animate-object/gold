@@ -163,7 +163,7 @@ export const SUMMER_CARDS: CardDef[] = [
     name: "Prodigal",
     season: Season.Summer,
     tags: [Tags.faith, Tags.community],
-    rules: [ignoreRegrets(1)],
+    rules: [ignoreRegrets(1, { seasons: [] })],
   },
   {
     name: "Sharp",

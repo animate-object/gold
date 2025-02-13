@@ -106,7 +106,8 @@ export const _computeCost = (
   cardId: CardId,
   gameState: GameState
 ): ResourcePool | undefined => {
-  if (getCard(cardId).beginningCard) {
+  const card = getCard(cardId);
+  if (card.beginningCard || card.fortune) {
     return { time: 0, money: 0, influence: 0 };
   }
 
@@ -143,6 +144,7 @@ export const canPurchaseCard = (
   gameState: GameState
 ): boolean => {
   const cost = computeCost(cardId, gameState);
+
   if (cost === undefined) {
     return false;
   }

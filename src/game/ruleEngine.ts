@@ -20,10 +20,12 @@ import {
   ResourcePool,
 } from "../types";
 import { neverLessThanZero } from "../util";
+import { isEmpty } from "lodash";
 
 const countMatchingCards = (
   tagMatchRules: TagMatchRules,
-  gameState: GameState
+  gameState: GameState,
+  ignoring: CardId[] | undefined = undefined
 ): [number[], number] => {
   const seasons = tagMatchRules.seasons ?? [
     Season.Spring,
@@ -36,6 +38,9 @@ const countMatchingCards = (
 
   const matchingCardIds: number[] = cardIds.filter((cardId) => {
     if (cardId === "empty") {
+      return false;
+    }
+    if (ignoring?.includes(cardId)) {
       return false;
     }
     const card = getCard(cardId);
@@ -77,7 +82,10 @@ const doesResourceCardApplyOnCurrentTurn = (
 
   const currentSeason = getCurrentSeason(gameState);
 
-  if (recurrence.seasons && !recurrence.seasons?.includes(currentSeason)) {
+  if (
+    isEmpty(recurrence.seasons) &&
+    !recurrence.seasons?.includes(currentSeason)
+  ) {
     console.debug("resource rule does not apply in current season");
     return false;
   }
@@ -99,17 +107,17 @@ const applyResourceRule = (
   rule: ResourceRule,
   gameState: GameState
 ) => {
-  console.log(`applying resource rule for ${cardId}`);
+  console.debug(`applying resource rule for ${cardId}`);
   const resources = { ...gameState.resources };
 
   if (!doesResourceCardApplyOnCurrentTurn(cardId, rule.recurrence, gameState)) {
-    console.log("resource card does not apply on current turn");
+    console.debug("resource card does not apply on current turn");
     return gameState;
   }
 
   let resourcesToApply = rule.resources;
   if (rule.match) {
-    console.log("applying match for resource rule");
+    console.debug("applying match for resource rule");
     const [count, transformFactor] = countMatchingCards(rule.match, gameState);
     console.debug(`matches: ${count}, transformFactor: ${transformFactor}`);
 
@@ -128,12 +136,8 @@ const applyResourceRule = (
   Object.entries(resourcesToApply).forEach(([key, value]) => {
     const resourceKey = key as keyof GameState["resources"];
     const oldValue = resources[resourceKey] ?? 0;
-
-    resources[resourceKey] = oldValue + value;
+    resources[resourceKey] = neverLessThanZero(oldValue + value);
   });
-
-  console.debug("applying resources", resourcesToApply);
-  console.debug("new resources", resources);
 
   return {
     ...gameState,
@@ -159,13 +163,13 @@ const applyReplacementRule = (
   rule: ReplacementRule,
   gameState: GameState
 ) => {
-  console.log(`applying replacement rule for ${card.id}`);
+  console.debug(`applying replacement rule for ${card.id}`);
   let newGameState = { ...gameState };
   const cardTurn = slotForCard(card.id, gameState);
   const initialPlacement = scanTableauForCard(card.id, gameState);
 
   if (cardTurn !== gameState.cardsPlayed) {
-    console.debug(
+    console.warn(
       `replacement rule does not apply on turn ${cardTurn}, ${gameState.cardsPlayed}`
     );
     return gameState;
@@ -176,7 +180,9 @@ const applyReplacementRule = (
     return gameState;
   }
 
-  const [matchingCards, _count] = countMatchingCards(rule.match, gameState);
+  const [matchingCards, _count] = countMatchingCards(rule.match, gameState, [
+    card.id,
+  ]);
 
   if (matchingCards.length === 0) {
     console.warn("no matching cards");
@@ -194,7 +200,7 @@ const applyReplacementRule = (
     return gameState;
   }
 
-  const [repaceSeason, replaceIndex] = location;
+  const [replaceSeason, replaceIndex] = location;
   const [removeSeason, removeIndex] = initialPlacement!;
 
   const removeFromTableau = {
@@ -208,10 +214,10 @@ const applyReplacementRule = (
 
   const replaceInTableau = {
     ...removeFromTableau,
-    [repaceSeason]: [
-      ...removeFromTableau[repaceSeason].slice(0, replaceIndex),
+    [replaceSeason]: [
+      ...removeFromTableau[replaceSeason].slice(0, replaceIndex),
       card.id,
-      ...removeFromTableau[repaceSeason].slice(replaceIndex + 1),
+      ...removeFromTableau[replaceSeason].slice(replaceIndex + 1),
     ],
   };
 
@@ -222,6 +228,15 @@ const applyReplacementRule = (
     cardsPlayed: newGameState.cardsPlayed - 1,
     tableau: replaceInTableau,
   };
+};
+
+export const applyFateRollRule = (card: CardT, gameState: GameState) => {
+  const cardTurn = slotForCard(card.id, gameState);
+  if (cardTurn !== gameState.cardsPlayed) {
+    console.debug(`fate roll rule does not apply on turn ${cardTurn}`);
+    return gameState;
+  }
+  return { ...gameState, state: "playing.waitingForFateDice" as const };
 };
 
 export const applyAllTurnEndRules = (
@@ -235,11 +250,18 @@ export const applyAllTurnEndRules = (
   if (rule.type === "replacement") {
     return applyReplacementRule(card, rule, gameState);
   }
+  if (rule.type === "fate-roll") {
+    return applyFateRollRule(card, gameState);
+  }
   return gameState;
 };
 
 const isTurnEndRule = (rule: Rule): rule is ResourceRule | ReplacementRule => {
-  return rule.type === "resources" || rule.type === "replacement";
+  return (
+    rule.type === "resources" ||
+    rule.type === "replacement" ||
+    rule.type === "fate-roll"
+  );
 };
 
 export const applyAllTurnEndRulesOnTableau = (

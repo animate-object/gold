@@ -89,8 +89,11 @@ export function seasonBgDeckStyles(season: Decks): string {
       return "bg-blue-200";
     case "beginnings":
       return "bg-purple-200";
-    case "fortunes":
-      return "bg-pink-200";
+    case "fortunesSpring":
+    case "fortunesSummer":
+    case "fortunesFall":
+    case "fortunesWinter":
+      return "bg-pink-50";
   }
 }
 
@@ -110,17 +113,19 @@ export function seasonBgBoldStyles(season: Season): string {
 export function seasonShadowStyles(season: Decks): string {
   switch (season) {
     case Season.Spring:
+    case "fortunesSpring":
       return "shadow-md shadow-green-500/50";
     case Season.Summer:
+    case "fortunesSummer":
       return "shadow-md shadow-yellow-500/50";
     case Season.Fall:
+    case "fortunesFall":
       return "shadow-md shadow-orange-500/50";
     case Season.Winter:
+    case "fortunesWinter":
       return "shadow-md shadow-blue-500/50";
     case "beginnings":
       return "shadow-md shadow-purple-300/50";
-    case "fortunes":
-      return "shadow-md shadow-red-300/50";
   }
 }
 

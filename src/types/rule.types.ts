@@ -7,7 +7,8 @@ type Rule =
   | DraftCostRule
   | ResourceRule
   | ScoringRule
-  | ReplacementRule;
+  | ReplacementRule
+  | FateRollRule;
 
 interface Recurring {
   trigger: "turn-start" | "end-of-season";
@@ -87,6 +88,10 @@ export interface ReplacementRule {
   type: "replacement";
   index: "first" | "last";
   match: TagMatchRules;
+}
+
+export interface FateRollRule {
+  type: "fate-roll";
 }
 
 export type { Rule };

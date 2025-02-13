@@ -9,6 +9,7 @@ import { canPurchaseCard } from "./game/cost";
 import { Tableau } from "./components/board/Tableau";
 import { DraftPanel } from "./components/board/DraftPanel";
 import { GameTracker } from "./components/board/GameTracker";
+import { FateDicePanel } from "./components/board/FateDice";
 
 const EMPTY_GAME_STATE: GameState = {
   cardsPlayed: 0,
@@ -30,8 +31,10 @@ const EMPTY_GAME_STATE: GameState = {
   gameConfiguration: {
     cardsDrawnPerTurn: 3,
     cardsDrawnOnFirstTurn: 2,
-    allowNegativeResources: true,
+    allowNegativeResources: false,
     timeAtStartOfSeason: 3,
+    fateDieFaces: 20,
+    rollFateAtSeasonChange: true,
   },
   state: "playing",
 };
@@ -58,7 +61,7 @@ export function App() {
         return;
       }
       if (state.gameConfiguration.allowNegativeResources) {
-        console.info("Playing card", cardId);
+        console.debug("Playing card", cardId);
         dispatch({ type: "select", cardId });
       } else {
         if (canPurchaseCard(cardId, state)) {
@@ -70,6 +73,10 @@ export function App() {
     },
     [state]
   );
+
+  const handlePlayFortuneCard = useCallback(() => {
+    dispatch({ type: "playFromFortuneDeck" });
+  }, [state]);
 
   const handleBuyTime = useCallback(() => {
     dispatch({ type: "tradeResources", tradeType: "buyTime" });
@@ -83,7 +90,18 @@ export function App() {
     <div className="bg-slate-50 h-screen w-full m-0 absolute top-0">
       <div className="p-2 flex flex-wrap">
         <Tableau {...state} />
-        <DraftPanel state={state} onDraftCard={handleSelectCardToDraft}>
+        <DraftPanel
+          state={state}
+          onDraftCard={handleSelectCardToDraft}
+          onPlayFortuneCard={handlePlayFortuneCard}
+        >
+          <FateDicePanel
+            onRoll={() =>
+              dispatch({ type: "rollFateDice", roll: Math.random() })
+            }
+            state={state}
+          />
+
           <GameTracker
             state={state}
             onBuyTime={handleBuyTime}

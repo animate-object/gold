@@ -35,7 +35,7 @@ export const WINTER_CARDS: CardDef[] = [
     tags: [Tags.influence, Tags.community],
     rules: [
       // costs 4 money, get 2 treasures
-      costRule(4, 0, 0),
+      costRule(0, 6, 0),
       baseTreasure(2),
     ],
   },

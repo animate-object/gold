@@ -32,7 +32,7 @@ export const GameTracker = ({ state, onBuyTime, onBuyInfluence }: Props) => {
   }, [state]);
 
   useEffect(() => {
-    if (state.state === "finished") {
+    if (state.state.startsWith("finished")) {
       const summary = `In your final hours, you evaluated your life as follows:
           Treasures: ${treasures}
           Regrets: ${regrets}
@@ -55,34 +55,44 @@ export const GameTracker = ({ state, onBuyTime, onBuyInfluence }: Props) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 px-4 text-sm w-44">
-      {Object.entries(readout).map(([key, value]) => (
-        <div className="inline-flex items-center gap-1">
-          <span className="font-semibold me-1">
-            {getReadoutLabelForKey(key)}
-          </span>
-          {value}
+    <div className="flex flex-col justify-between w-36 bg-slate-100 rounded-md p-1">
+      <div>
+        <h3 className="text-center text-sm mb-2">Game</h3>
+        <div className="flex flex-wrap gap-2 text-sm  w-36">
+          {Object.entries(readout).map(([key, value]) => (
+            <div className="inline-flex items-center gap-1">
+              <span className="font-semibold me-1">
+                {getReadoutLabelForKey(key)}
+              </span>
+              {value}
+            </div>
+          ))}
         </div>
-      ))}
-      <div class="flex text-xs">
-        <Tooltip content="Buy Time">
-          <button
-            onClick={onBuyTime}
-            disabled={state.resources.money < 2}
-            class="inline-flex gap-1 items-center bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-1 rounded-l"
-          >
-            Buy <Resource.Time /> 2:1
-          </button>
-        </Tooltip>
-        <Tooltip content="Buy Influence">
-          <button
-            onClick={onBuyInfluence}
-            disabled={state.resources.money < 2}
-            class="inline-flex gap-1 items-center bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-2 rounded-r"
-          >
-            Buy <Resource.Influence /> 2:1
-          </button>
-        </Tooltip>
+      </div>
+      <div className="w-100 flex flex-col gap-2">
+        <div className="inline-flex justify-center gap-2 text-sm w-100">
+          Trade <Resource.Money /> 2:1
+        </div>
+        <div class="flex text-xs justify-center">
+          <Tooltip content="Buy Time">
+            <button
+              onClick={onBuyTime}
+              disabled={state.resources.money < 2}
+              class="inline-flex gap-1 items-center bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-1 rounded-l"
+            >
+              Buy <Resource.Time />
+            </button>
+          </Tooltip>
+          <Tooltip content="Buy Influence">
+            <button
+              onClick={onBuyInfluence}
+              disabled={state.resources.money < 2}
+              class="inline-flex gap-1 items-center bg-gray-300 hover:bg-gray-400 disabled:hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-75 text-gray-800 font-bold py-1 px-2 rounded-r"
+            >
+              Buy <Resource.Influence />
+            </button>
+          </Tooltip>
+        </div>
       </div>
     </div>
   );

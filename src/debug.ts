@@ -25,7 +25,7 @@ const printAllCards = ({ filter, season }: PrintArgs = {}) => {
     : cards;
 
   cards.forEach((card) => {
-    console.info(`Card #${card.id}: ${card.name} (${card.season})`);
+    console.debug(`Card #${card.id}: ${card.name} (${card.season})`);
   });
 };
 

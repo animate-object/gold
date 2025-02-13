@@ -91,16 +91,18 @@ export function EmptyCard() {
 export function Deck({
   variant,
   label,
+  onClick,
 }: {
   variant: DisplayableDecks;
   label: string;
+  onClick?: () => void;
 }) {
   const seasonStyle =
     variant === "discard"
       ? "bg-slate-300 shadow-md shadow-slate-700/50"
       : classNames(seasonShadowStyles(variant), seasonBgDeckStyles(variant));
   return (
-    <div className={classNames(CARD_CLASSES, seasonStyle)}>
+    <div onClick={onClick} className={classNames(CARD_CLASSES, seasonStyle)}>
       <h1 className="text-lg">{label}</h1>
     </div>
   );

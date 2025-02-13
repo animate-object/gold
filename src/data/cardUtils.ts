@@ -11,6 +11,7 @@ import {
 } from "../types";
 
 export type CardDef = Omit<Card, "id">;
+export type FortuneCardDef = Omit<Card, "id"> & { fortune: true };
 
 export const baseResourceRule = (
   time: number,

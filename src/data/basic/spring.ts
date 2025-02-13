@@ -133,20 +133,10 @@ export const SPRING_CARDS: CardDef[] = [
     rules: [draftDiscount(1, 0, 0, [Tags.love, Tags.creative, Tags.sunshine])],
   },
   {
-    name: "Childhood Illness",
-    season: Season.Spring,
-    tags: [Tags.health],
-    rules: [
-      // TODO this belongs in fate deck
-    ],
-  },
-  {
     name: "Troublemaker",
     season: Season.Spring,
     tags: [Tags.confidence, Tags.creative],
-    rules: [
-      // TODO fate dice
-    ],
+    rules: [baseResourceRule(0, 0, 1), { type: "fate-roll" }],
   },
   {
     name: "First Chair",

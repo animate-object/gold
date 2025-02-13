@@ -2,7 +2,28 @@ import { useMemo } from "preact/hooks";
 import { canPurchaseCard, computeCost } from "../../game/cost";
 import { Resource } from "../GameIcon";
 import classNames from "classnames";
-import { CardId, GameState } from "../../types";
+import { CardId, GameState, ResourcePool } from "../../types";
+
+export const CostDisplay = ({
+  time,
+  money,
+  influence,
+  classNames: extraClasses,
+}: ResourcePool & { classNames?: string }) => {
+  return (
+    <div className={classNames("flex text-sm w-100 gap-3", extraClasses)}>
+      <div className="inline-flex items-center gap-1">
+        <Resource.Time /> {time}
+      </div>
+      <div className="inline-flex items-center gap-1">
+        <Resource.Money /> {money}
+      </div>
+      <div className="inline-flex items-center gap-1">
+        <Resource.Influence /> {influence}
+      </div>
+    </div>
+  );
+};
 
 export const CardCost = ({
   gameState,
@@ -21,20 +42,11 @@ export const CardCost = ({
   );
 
   return (
-    <div
-      className={classNames("flex text-sm w-100 gap-3", {
-        "text-red-500": !canPayForCard,
-      })}
-    >
-      <div className="inline-flex items-center gap-1">
-        <Resource.Time /> {time}
-      </div>
-      <div className="inline-flex items-center gap-1">
-        <Resource.Money /> {money}
-      </div>
-      <div className="inline-flex items-center gap-1">
-        <Resource.Influence /> {influence}
-      </div>
-    </div>
+    <CostDisplay
+      classNames={!canPayForCard ? "text-red-500" : undefined}
+      time={time}
+      money={money}
+      influence={influence}
+    />
   );
 };

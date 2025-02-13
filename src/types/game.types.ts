@@ -1,5 +1,6 @@
 import type { Decks, Season } from "./season.types";
 import type { CardId } from "./card.types";
+import { FateDieFace } from "./fate.types";
 
 export interface ResourcePool {
   money: number;
@@ -24,6 +25,11 @@ interface ConfigOptions {
   // time alotted at the start of each
   // season (not including spring)
   timeAtStartOfSeason: number;
+  // fate die face count
+  fateDieFaces: number;
+  // whether to roll the fate die when the
+  // season changes
+  rollFateAtSeasonChange: boolean;
 }
 
 export interface GameState {
@@ -35,7 +41,15 @@ export interface GameState {
   discard: CardId[];
   faceCardIds: CardSlot[];
   gameConfiguration: ConfigOptions;
-  state: "playing" | "finished";
+  lastFateRoll?: {
+    roll: number;
+    result: FateDieFace;
+  };
+  state:
+    | "playing"
+    | "playing.waitingForFateDice"
+    | "finished.standard"
+    | "finished.early";
 }
 
 // score is always derived, not stateful,

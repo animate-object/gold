@@ -4,8 +4,12 @@ import {
   SUMMER_CARDS,
   FALL_CARDS,
   WINTER_CARDS,
+  SPRING_FORTUNE_CARDS,
+  SUMMER_FORTUNE_CARDS,
+  FALL_FORTUNE_CARDS,
+  WINTER_FORTUNE_CARDS,
 } from "../data/cardData";
-import { Card, CardId, Deck, Decks } from "../types";
+import { Card, CardId, Deck, Decks, Season } from "../types";
 import { shuffle } from "../utils/array";
 
 export const allCards: Card[] = [
@@ -14,6 +18,10 @@ export const allCards: Card[] = [
   ...SUMMER_CARDS,
   ...FALL_CARDS,
   ...WINTER_CARDS,
+  ...SPRING_FORTUNE_CARDS,
+  ...SUMMER_FORTUNE_CARDS,
+  ...FALL_FORTUNE_CARDS,
+  ...WINTER_FORTUNE_CARDS,
 ].map((card, idx) => {
   return {
     ...card,
@@ -21,17 +29,46 @@ export const allCards: Card[] = [
   };
 });
 
-const springCards = allCards.filter(
-  (card) => card.season === "spring" && !card.beginningCard
-);
-const summerCards = allCards.filter((card) => card.season === "summer");
-const fallCards = allCards.filter((card) => card.season === "fall");
-const winterCards = allCards.filter((card) => card.season === "winter");
+interface Filters {
+  beginning?: boolean;
+  fortune?: boolean;
+}
+const seasonFilter = (
+  season: Season,
+  filters: Filters = { beginning: false, fortune: false }
+): ((card: Card) => boolean) => {
+  return (card: Card) => {
+    if (!!card.beginningCard != filters.beginning) {
+      return false;
+    }
+    if (!!card.fortune != filters.fortune) {
+      return false;
+    }
+    return card.season === season;
+  };
+};
+
+const springCards = allCards.filter(seasonFilter(Season.Spring));
+const summerCards = allCards.filter(seasonFilter(Season.Summer));
+const fallCards = allCards.filter(seasonFilter(Season.Fall));
+const winterCards = allCards.filter(seasonFilter(Season.Winter));
 const beginningCards = allCards.filter((card) => card.beginningCard);
-const springFortuneCards = [] as Card[];
-const summerFortuneCards = [] as Card[];
-const fallFortuneCards = [] as Card[];
-const winterFortuneCards = [] as Card[];
+const springFortuneCards = allCards.filter(
+  seasonFilter(Season.Spring, { fortune: true, beginning: false })
+);
+const summerFortuneCards = allCards.filter(
+  seasonFilter(Season.Summer, { fortune: true, beginning: false })
+);
+const fallFortuneCards = allCards.filter(
+  seasonFilter(Season.Fall, { fortune: true, beginning: false })
+);
+const winterFortuneCards = allCards.filter(
+  seasonFilter(Season.Winter, { fortune: true, beginning: false })
+);
+
+console.log({
+  springFortuneCards,
+});
 
 const shuffledIds = (cards: Card[]): CardId[] =>
   shuffle(cards.map((card) => card.id));

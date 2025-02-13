@@ -109,6 +109,12 @@ export const describeTagMatch = (
   return `${base} ${withPart} ${joined} ${seasonPart} ${ratio}`;
 };
 
+export const describeResourceChanges = (
+  resources: Partial<ResourcePool>
+): string => {
+  return resourceDescriptors(resources, "change").join(",");
+};
+
 export const describeResourceRule = (rule: ResourceRule): string => {
   // components of the phrase:
   // [when] [resource changes] [for [ratio] [matching [tags]]]
@@ -120,9 +126,7 @@ export const describeResourceRule = (rule: ResourceRule): string => {
   const when =
     rule.recurrence === "once" ? "" : `${describeRecurrence(rule.recurrence)} `;
 
-  const resourceChange = resourceDescriptors(rule.resources, "change").join(
-    ","
-  );
+  const resourceChange = describeResourceChanges(rule.resources);
 
   const match = rule.match ? ` ${describeTagMatch(rule.match)}` : "";
 
@@ -179,7 +183,10 @@ const ruleDescriptorString = (rule: Rule): string => {
       return describeReplacementRule(rule);
     case "scoring":
       return describeScoringRule(rule);
+    case "fate-roll":
+      return "Roll fate dice";
   }
+  return "";
 };
 
 function parseRuleDescriptor(ruleDescriptor: string): string[] {
@@ -203,16 +210,10 @@ function parseRuleDescriptor(ruleDescriptor: string): string[] {
   return result;
 }
 
-export const describeRule = (rules: Rule): ReactNode => {
-  const stringDescriptor = ruleDescriptorString(rules);
-
-  // split components by `[` and `]`
-
+export const substituteSymbolsForIcons = (
+  stringDescriptor: string
+): React.ReactNode => {
   const components = parseRuleDescriptor(stringDescriptor);
-  // console.log(components);
-
-  console.log("components", components);
-
   return (
     <div className="flex flex-wrap gap-0.5">
       {components.map((component) => {
@@ -223,6 +224,18 @@ export const describeRule = (rules: Rule): ReactNode => {
       })}
     </div>
   );
+};
 
-  // return stringDescriptor;
+export const describeRule = (rules: Rule): ReactNode => {
+  const stringDescriptor = ruleDescriptorString(rules);
+  return substituteSymbolsForIcons(stringDescriptor);
+};
+
+// Sometimes used outside rule descriptions...
+export const describeResourceChangesWithSubstitution = (
+  resources: Partial<ResourcePool>
+): ReactNode => {
+  const string = describeResourceChanges(resources);
+
+  return substituteSymbolsForIcons(string);
 };

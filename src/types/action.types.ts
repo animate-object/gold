@@ -2,10 +2,12 @@ import { CardId } from "./card.types";
 
 export type GameActionType =
   | "draft"
+  | "playFromFortuneDeck"
   | "select"
   | "applyEndTurnRules"
   | "incrementTurn"
-  | "tradeResources";
+  | "tradeResources"
+  | "rollFateDice";
 
 export type GameActionBase = {
   type: GameActionType;
@@ -33,9 +35,20 @@ export interface TradeResources extends GameActionBase {
   tradeType: "buyTime" | "buyInfluence";
 }
 
+export interface PlayFromFortuneDeck extends GameActionBase {
+  type: "playFromFortuneDeck";
+}
+
+export interface RollFateDice extends GameActionBase {
+  type: "rollFateDice";
+  roll: number;
+}
+
 export type GameAction =
   | Draft
+  | PlayFromFortuneDeck
   | Select
   | TradeResources
   | ApplyEndTurnRules
-  | IncrementTurn;
+  | IncrementTurn
+  | RollFateDice;

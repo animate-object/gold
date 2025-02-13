@@ -1,3 +1,4 @@
+import { getCard } from "../cards/store";
 import { CardId } from "../types";
 import type {
   ApplyEndTurnRules,
@@ -10,12 +11,15 @@ import type {
 import type { QueueAugmentedState } from "../types/engine.types";
 import { canPurchaseCard, payForCard } from "./cost";
 import { drawCards } from "./deck";
+import { rollFateDice } from "./fate";
 import { applyAllTurnEndRulesOnTableau } from "./ruleEngine";
 import {
   currentCardIsEndOfSeason,
   getCurrentSeason,
   currentCardSeasonIndex,
   getCurrentDeck,
+  getCurrentFortuneDeck,
+  nextCardIsEndOfSeason,
 } from "./selectors";
 
 // steps in a turn:
@@ -65,22 +69,57 @@ const draftCards = (
   };
 };
 
+const playFromFortuneDeck = (
+  state: QueueAugmentedState
+): QueueAugmentedState => {
+  // draw first card from fortune deck
+
+  // then queue up selectCard with that card
+
+  const deckName = getCurrentFortuneDeck(state);
+  const deck = state.decks[deckName];
+
+  const { drawn: fortuneCardIds, deck: updatedDeck } = drawCards(deck, 1);
+
+  const cardId = fortuneCardIds[0];
+  const card = getCard(cardId);
+  console.info("playing fortune card", card);
+
+  return {
+    ...state,
+    decks: {
+      ...state.decks,
+      [deckName]: updatedDeck,
+    },
+    queue: [
+      ...state.queue,
+      {
+        type: "select",
+        cardId,
+      },
+    ],
+  };
+};
+
 const selectCard = (
   state: QueueAugmentedState,
   { cardId }: Select
 ): QueueAugmentedState => {
-  const updated = { ...state };
-
-  if (
-    !state.gameConfiguration.allowNegativeResources &&
-    !canPurchaseCard(cardId, state)
-  ) {
-    console.warn("Not enough resources to purchase card", cardId);
-    return updated;
+  const canPurchase =
+    canPurchaseCard(cardId, state) ||
+    state.gameConfiguration.allowNegativeResources;
+  if (!canPurchase) {
+    console.warn("You can't afford that card", cardId);
+    return state;
+  }
+  if (state.state !== "playing") {
+    console.warn(`Playing cards isn't allowed in state ${state.state}`);
+    return state;
   }
 
   const currentSeason = getCurrentSeason(state);
   const currentSeasonIndex = currentCardSeasonIndex(state);
+  const updated = { ...state };
 
   const toDiscard: CardId[] = state.faceCardIds
     .filter((id) => id !== cardId)
@@ -131,7 +170,7 @@ const applyEndTurnRules = (
   ) as QueueAugmentedState;
 
   if (currentCardIsEndOfSeason(afterRules)) {
-    console.log("end of season, applying time bonus");
+    console.debug("end of season, applying time bonus");
     return {
       ...afterRules,
       resources: {
@@ -153,8 +192,14 @@ const incrementTurn = (
   if (state.cardsPlayed >= 16) {
     return {
       ...state,
-      state: "finished",
+      state: "finished.standard" as const,
     };
+  }
+
+  if (state.gameConfiguration.rollFateAtSeasonChange) {
+    if (nextCardIsEndOfSeason(state)) {
+      return { ...state, state: "playing.waitingForFateDice" as const };
+    }
   }
 
   return {
@@ -193,7 +238,7 @@ export const gameEngineReducer = (
   state: QueueAugmentedState,
   action: GameAction
 ): QueueAugmentedState => {
-  if (state.state === "finished") {
+  if (state.state.startsWith("finished")) {
     return state;
   }
 
@@ -210,6 +255,9 @@ export const gameEngineReducer = (
     case "draft":
       updated = draftCards(updated, action);
       break;
+    case "playFromFortuneDeck":
+      updated = playFromFortuneDeck(updated);
+      break;
     case "select":
       updated = selectCard(updated, action);
       break;
@@ -221,6 +269,9 @@ export const gameEngineReducer = (
       break;
     case "tradeResources":
       updated = tradeResources(updated, action);
+      break;
+    case "rollFateDice":
+      updated = rollFateDice(updated, action.roll);
       break;
     default:
       console.warn("Unhandled action", action);

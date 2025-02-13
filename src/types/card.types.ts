@@ -39,6 +39,7 @@ interface Card {
   season: Season;
   tags: Tags[];
   beginningCard?: boolean;
+  fortune?: boolean;
 }
 
 export type { Card, CardId };
