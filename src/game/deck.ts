@@ -16,6 +16,7 @@ export const drawCards = (preShuffledDeck: Deck, count: number): Draw => {
   const amountToDraw = Math.min(count, preShuffledDeck.cards.length);
   if (amountToDraw < count) {
     console.warn("Not enough cards in deck");
+    throw new Error("Not enough cards in deck");
   }
 
   const drawn = preShuffledDeck.cards.slice(-amountToDraw);

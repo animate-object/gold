@@ -29,6 +29,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement: "{{name}} was born to wealth and privilege.",
   },
   {
     name: "Overbearing Mother",
@@ -51,6 +52,8 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement:
+      "{{name}} was raised by a mother who wanted the best for {{pronoun.o}}.",
   },
   {
     name: "Strict Father",
@@ -74,6 +77,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement: "{{name.p}} father was a strict disciplinarian.",
   },
   {
     name: "Military Brat",
@@ -97,6 +101,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement: "{{name}} was raised on base, by a military family.",
   },
   {
     name: "Religious Upbringing",
@@ -118,6 +123,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         ratio: ratio2to1,
       }),
     ],
+    narrativeStatement: "{{name}} grew up in the church.",
   },
   {
     name: "Struggling Family",
@@ -131,6 +137,8 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         ratio: ratio2to1,
       }),
     ],
+    narrativeStatement:
+      "{{name.p}} family sometimes struggled to make ends meet.",
   },
   {
     name: "Single Parent",
@@ -147,6 +155,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
       },
       ignoreRegrets(2),
     ],
+    narrativeStatement: "{{name}} was raised by a single parent.",
   },
   {
     name: "Older Siblings",
@@ -160,6 +169,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         ratio: ratio4to1,
       }),
     ],
+    narrativeStatement: "{{name}} was the youngest of several siblings.",
   },
   {
     name: "Small Town Life",
@@ -175,6 +185,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement: "{{name}} grew up in a small country town.",
   },
   {
     name: "Farm Kid",
@@ -190,6 +201,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement: "{{name}} grew up on the family farm.",
   },
   {
     name: "Urban Elite",
@@ -209,6 +221,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement: "{{name}} was born to well-educated urbanites.",
   },
   {
     name: "Eldest Child",
@@ -227,6 +240,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         seasons: [Season.Spring, Season.Winter],
       }),
     ],
+    narrativeStatement: "{{name}} was the eldest of several siblings.",
   },
   {
     name: "Child of Immigrants",
@@ -247,6 +261,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         ratio: ratio2to1,
       }),
     ],
+    narrativeStatement: "{{name}} was born to first generation immigrants.",
   },
   {
     name: "Orphan",
@@ -268,6 +283,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         ratio: ratio3to1,
       }),
     ],
+    narrativeStatement: "{{name}} was raised in an orphanage.",
   },
   {
     name: "Only Child",
@@ -290,6 +306,7 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement: "{{name}} grew up an only child.",
   },
   {
     name: "Twin",
@@ -306,5 +323,6 @@ export const BEGINNINGS_CARDS: CardDef[] = [
         },
       },
     ],
+    narrativeStatement: "{{name}} had a twin!",
   },
 ];

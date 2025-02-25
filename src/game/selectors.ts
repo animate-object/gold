@@ -30,6 +30,10 @@ export const currentCardIsEndOfSeason = (gameState: GameState): boolean => {
   return gameState.cardsPlayed % 4 === 0;
 };
 
+export const getCurrentCardIsBeginningOfSeason = (gameState: GameState) => {
+  return gameState.cardsPlayed % 4 === 0;
+};
+
 export const nextCardIsEndOfSeason = (gameState: GameState): boolean => {
   if (getCurrentSeason(gameState) === Season.Winter) return false;
 

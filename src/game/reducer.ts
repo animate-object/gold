@@ -12,6 +12,7 @@ import type { QueueAugmentedState } from "../types/engine.types";
 import { canPurchaseCard, payForCard } from "./cost";
 import { drawCards } from "./deck";
 import { rollFateDice } from "./fate";
+import { buildNarrativeStatement } from "./narrative";
 import { applyAllTurnEndRulesOnTableau } from "./ruleEngine";
 import {
   currentCardIsEndOfSeason,
@@ -157,6 +158,13 @@ const selectCard = (
 
   return {
     ...payForCard(cardId, withUpdatedTableau),
+    narrativeState: {
+      ...state.narrativeState,
+      narrativeRecord: [
+        ...state.narrativeState.narrativeRecord,
+        buildNarrativeStatement(getCard(cardId), state),
+      ],
+    },
     queue: updatedQueue,
   };
 };
@@ -272,6 +280,16 @@ export const gameEngineReducer = (
       break;
     case "rollFateDice":
       updated = rollFateDice(updated, action.roll);
+      break;
+    case "selectNarrativeState":
+      updated = {
+        ...updated,
+        narrativeState: {
+          ...updated.narrativeState,
+          ...action,
+        },
+        state: "playing" as const,
+      };
       break;
     default:
       console.warn("Unhandled action", action);

@@ -39,12 +39,13 @@ export const CardRules = ({
 }) => {
   const rules = useMemo(() => {
     if (includeCostRules) {
+      console.log("Expect to see card cost rules");
       return card.rules;
     }
     return card.rules.filter((rule) => rule.type !== "cost");
   }, [card, includeCostRules]);
   return (
-    <div className="flex flex-shrink h-full text-xs">
+    <div className="flex flex-shrink h-full text-xt">
       <div className="flex flex-col gap-1">
         {rules.map((rule, index) => (
           <span className="hover:bg-slate-200 rounded select-none" key={index}>
@@ -59,12 +60,13 @@ export const CardRules = ({
 interface Props {
   cardId: CardId;
   onClick?: () => void;
+  displayCostRules?: boolean;
 }
 
 const CARD_CLASSES =
   "flex flex-col h-48 w-32 p-2 rounded overflow-hidden shadow-md";
 
-export function Card({ cardId, onClick }: Props) {
+export function Card({ cardId, onClick, displayCostRules }: Props) {
   const card = useMemo(() => getCard(cardId), [cardId]);
 
   const seasonStyle = classNames(
@@ -74,17 +76,29 @@ export function Card({ cardId, onClick }: Props) {
 
   return (
     <div className={classNames(seasonStyle, CARD_CLASSES)} onClick={onClick}>
-      <h1 className="text-md mb-1">{card.name}</h1>
+      <h1 className="text-sm mb-1">{card.name}</h1>
       {/* cost rules are described on the tableau */}
-      <CardRules card={card} includeCostRules={false} />
+      <CardRules card={card} includeCostRules={displayCostRules} />
       <CardTags card={card} />
     </div>
   );
 }
 
-export function EmptyCard() {
+interface EmptyCardProps {
+  children?: React.ReactNode;
+}
+
+export function EmptyCard({ children }: EmptyCardProps): React.ReactNode {
   return (
-    <div className={classNames(CARD_CLASSES, cardSeasonStyles("empty"))} />
+    <div
+      className={classNames(
+        CARD_CLASSES,
+        cardSeasonStyles("empty"),
+        "flex justify-center items-center"
+      )}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -111,13 +125,19 @@ export function Deck({
 export const DraftCard = ({
   cardId,
   onClick,
+  displayCostRules,
 }: {
   cardId: CardId | "empty";
   onClick: () => void;
+  displayCostRules?: boolean;
 }) => {
   return cardId === "empty" ? (
     <EmptyCard />
   ) : (
-    <Card cardId={cardId} onClick={onClick} />
+    <Card
+      cardId={cardId}
+      onClick={onClick}
+      displayCostRules={displayCostRules}
+    />
   );
 };

@@ -4,10 +4,12 @@ import {
   DraftCostRule,
   Recurrence,
   ResourceRule,
+  FateRollRule,
   ScoringRule,
   Season,
   TagMatchRules,
   Tags,
+  ReplacementRule,
 } from "../types";
 
 export type CardDef = Omit<Card, "id">;
@@ -91,8 +93,21 @@ export const draftDiscount = (
   seasons,
 });
 
+export const replacement = (
+  index: "first" | "last",
+  match: TagMatchRules
+): ReplacementRule => ({
+  type: "replacement",
+  index,
+  match,
+});
+
 export const ignoreRegrets = (n: number) => baseRegret(-n);
 
 export const ratio2to1 = { matches: 2, value: 1 };
 export const ratio3to1 = { matches: 3, value: 1 };
 export const ratio4to1 = { matches: 4, value: 1 };
+
+export const forceRollFateDice = (): FateRollRule => ({
+  type: "fate-roll",
+});

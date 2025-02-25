@@ -97,3 +97,13 @@ export const GameTracker = ({ state, onBuyTime, onBuyInfluence }: Props) => {
     </div>
   );
 };
+
+export const GameTrackerWrapper = ({ state, ...rest }: Props) => {
+  const isSettingNarrative = state.state === "narrative.init";
+
+  if (!isSettingNarrative) {
+    return <GameTracker state={state} {...rest} />;
+  }
+
+  return <div className="w-36 bg-slate-100 rounded-md p-1" />;
+};

@@ -4,8 +4,9 @@ export default {
   theme: {
     extend: {
       fontSize: {
-        xs: "0.625rem",
-        tiny: "0.5rem",
+        xs: "0.625em",
+        tiny: "0.5em",
+        xt: "0.475em",
       },
     },
   },

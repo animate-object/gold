@@ -1,12 +1,13 @@
-import { Deck, DraftCard } from "../../cards/Card";
+import { Deck, DraftCard, EmptyCard } from "../../cards/Card";
 import { getCurrentDeck, getCurrentSeason } from "../../game/selectors";
-import { CardSlot, GameState } from "../../types";
+import { CardSlot, DisplayableDecks, GameState } from "../../types";
 import { _capitalize } from "../../util";
 import { CardCost, CostDisplay } from "./CardCost";
 
 interface Props {
   state: GameState;
-  children: React.ReactNode;
+  slot1?: React.ReactNode;
+  slot2?: React.ReactNode;
   onDraftCard: (cardId: CardSlot) => void;
   onPlayFortuneCard: () => void;
 }
@@ -43,25 +44,24 @@ export const LabeledCards = ({
 }: LabeledCardsProps) => {
   return (
     <div className="flex flex-col gap-2 justify-center items-center">
-      <div className="italic text-sm">{label}</div>
+      <div className="italic text-sm h-4">{label}</div>
       {children}
       {bottomContent ?? <div className="h-4" />}
     </div>
   );
 };
 
-export const DraftPanel = ({
+export const InPlayDraftPanel = ({
   state,
-  children,
   onDraftCard,
   onPlayFortuneCard,
-}: Props) => {
+}: Omit<Props, "slot1" | "slot2">) => {
   const currentDeck = getCurrentDeck(state);
   const currentSeason = getCurrentSeason(state);
   const { cardsDrawnPerTurn } = state.gameConfiguration;
 
   return (
-    <div className="flex gap-3 bg-gray-200 p-2 rounded-md mt-2">
+    <>
       <LabeledCards label="Discard">
         <Deck variant="discard" label={`Discard (${state.discard.length})`} />
       </LabeledCards>
@@ -83,7 +83,11 @@ export const DraftPanel = ({
               ) : undefined
             }
           >
-            <DraftCard cardId={cardId} onClick={() => onDraftCard(cardId)} />
+            <DraftCard
+              cardId={cardId}
+              onClick={() => onDraftCard(cardId)}
+              displayCostRules={state.gameConfiguration.displayCostRules}
+            />
           </LabeledCards>
         );
       })}
@@ -97,7 +101,48 @@ export const DraftPanel = ({
           label={`Fortunes of ${_capitalize(currentSeason)}`}
         />
       </LabeledCards>
-      {children}
+    </>
+  );
+};
+
+export const PreAndPostGameDraftPanel = ({ state }: Pick<Props, "state">) => {
+  const cardsDrawnPerTurn = state.gameConfiguration.cardsDrawnPerTurn;
+
+  return (
+    <>
+      {Array.from({ length: cardsDrawnPerTurn + 3 }).map((_, idx) => {
+        return (
+          <LabeledCards label="">
+            <EmptyCard />
+          </LabeledCards>
+        );
+      })}
+    </>
+  );
+};
+
+export const DraftPanel = ({
+  state,
+  slot1,
+  slot2,
+  onDraftCard,
+  onPlayFortuneCard,
+}: Props) => {
+  const playState = state.state;
+  return (
+    <div className="flex gap-3 bg-gray-200 p-2 rounded-md mt-2">
+      {slot1}
+      {playState.startsWith("playing") && (
+        <InPlayDraftPanel
+          state={state}
+          onDraftCard={onDraftCard}
+          onPlayFortuneCard={onPlayFortuneCard}
+        />
+      )}
+      {!playState.startsWith("playing") && (
+        <PreAndPostGameDraftPanel state={state} />
+      )}
+      {slot2}
     </div>
   );
 };

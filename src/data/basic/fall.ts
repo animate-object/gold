@@ -6,6 +6,7 @@ import {
   CardDef,
   costRule,
   draftDiscount,
+  ignoreRegrets,
   ratio2to1,
   ratio3to1,
   ratio4to1,
@@ -14,24 +15,34 @@ import {
 
 export const FALL_CARDS: CardDef[] = [
   {
-    name: "Mentee",
+    name: "Therapy",
     season: Season.Fall,
-    tags: [Tags.education, Tags.friend],
-    rules: [
-      // TODO
-    ],
+    tags: [Tags.health],
+    rules: [costRule(0, 1, 0), ignoreRegrets(1)],
+    narrativeStatement: "{{name}} unpacked it all in therapy.",
   },
+
   {
     name: "World Travel",
     season: Season.Fall,
     tags: [Tags.travel],
     rules: [costRule(1, 2, 0), baseTreasure(2)],
+    narrativeStatement: "{{name}} saw the world.",
   },
   {
     name: "Executive",
     season: Season.Fall,
     tags: [Tags.career, Tags.finance],
-    rules: [costRule(2, 0, 1), baseResourceRule(0, 6, 2)],
+    rules: [
+      costRule(4, 0, 2),
+      baseResourceRule(0, 6, 2),
+      recurringResourceRule(0, 4, 1, {
+        trigger: "end-of-season",
+        seasons: [Season.Fall],
+      }),
+    ],
+    narrativeStatement:
+      "{{name}} climbed the corporate ladder, all the way to the top.",
   },
   {
     name: "Empty Nesters",
@@ -46,6 +57,7 @@ export const FALL_CARDS: CardDef[] = [
         ratio: ratio4to1,
       }),
     ],
+    narrativeStatement: "{{name.p}} children moved out. Sure is quiet now.",
   },
   {
     name: "Hobbyist",
@@ -64,6 +76,7 @@ export const FALL_CARDS: CardDef[] = [
         ratio: ratio2to1,
       }),
     ],
+    narrativeStatement: "{{name}} kept several hobbies.",
   },
   {
     name: "Marathon",
@@ -76,20 +89,28 @@ export const FALL_CARDS: CardDef[] = [
       draftDiscount(1, 0, 0, [Tags.health, Tags.discipline]),
       baseTreasure(1),
     ],
+    narrativeStatement: "{{name}} trained hard for the long run.",
   },
   {
     name: "Doctor's Orders",
     season: Season.Fall,
     tags: [Tags.health],
     rules: [
-      // TODO -- this should do something with fate dice
+      recurringResourceRule(2, 0, 0, {
+        trigger: "end-of-season",
+      }),
+      draftDiscount(1, 1, 0, [Tags.health]),
     ],
+    narrativeStatement:
+      "{{name}} got some tough advice from {{pronoun.p}} doctor, and took it seriously.",
   },
   {
     name: "National Parks",
     season: Season.Fall,
     tags: [Tags.sunshine, Tags.travel],
     rules: [costRule(0, 1, 0), baseTreasure(1)],
+    narrativeStatement:
+      "{{name}} fell in love with nature, and visited many national parks.",
   },
   {
     name: "Deacon",
@@ -103,6 +124,7 @@ export const FALL_CARDS: CardDef[] = [
         seasons: [Season.Fall, Season.Winter],
       }),
     ],
+    narrativeStatement: "{{name}} was a deacon in {{pronoun.p}} church.",
   },
   {
     name: "Down Sizing",
@@ -116,6 +138,8 @@ export const FALL_CARDS: CardDef[] = [
         seasons: [Season.Fall],
       }),
     ],
+    narrativeStatement:
+      "{{name}} sold {{pronoun.p}} house and moved to a condo.",
   },
   {
     name: "Old Friends",
@@ -128,12 +152,15 @@ export const FALL_CARDS: CardDef[] = [
         seasons: [Season.Spring, Season.Summer],
       }),
     ],
+    narrativeStatement:
+      "{{name}} stayed in touch with many of {{pronoun.p}} old friends.",
   },
   {
     name: "Jam Band",
     season: Season.Fall,
     tags: [Tags.creative, Tags.community],
     rules: [baseTreasure(1)],
+    narrativeStatement: "{{name}} played in a jam band. Aw yeah.",
   },
   {
     name: "Councilperson",
@@ -147,6 +174,7 @@ export const FALL_CARDS: CardDef[] = [
       }),
       draftDiscount(1, 1, 0, [Tags.community, Tags.influence]),
     ],
+    narrativeStatement: "{{name}} was elected to the local city council.",
   },
   {
     name: "Good Investing",
@@ -167,18 +195,21 @@ export const FALL_CARDS: CardDef[] = [
         }
       ),
     ],
+    narrativeStatement: "{{name}} made some good investments.",
   },
   {
     name: "15 Minutes",
     season: Season.Fall,
     tags: [Tags.influence],
     rules: [baseResourceRule(0, 0, 1)],
+    narrativeStatement: "{{name}} had a brief moment of fame.",
   },
   {
     name: "League (e.g. bowling)",
     season: Season.Fall,
     tags: [Tags.community, Tags.friend],
     rules: [baseTreasure(1)],
+    narrativeStatement: "{{name}} played on a league team.",
   },
   {
     name: "Family Reunions",
@@ -191,6 +222,7 @@ export const FALL_CARDS: CardDef[] = [
         ratio: ratio2to1,
       }),
     ],
+    narrativeStatement: "{{name}} organized several family reunions.",
   },
   {
     name: "Expansion (franchising)",
@@ -216,6 +248,8 @@ export const FALL_CARDS: CardDef[] = [
         }
       ),
     ],
+    narrativeStatement:
+      "{{name}} expanded {{pronoun.p}} business to a second location. The sky's the limit!",
   },
   {
     name: "Competence",
@@ -230,6 +264,7 @@ export const FALL_CARDS: CardDef[] = [
         ratio: ratio3to1,
       }),
     ],
+    narrativeStatement: "{{name}} entered an era of great competence.",
   },
   {
     name: "Cornerstone",
@@ -243,5 +278,6 @@ export const FALL_CARDS: CardDef[] = [
         ratio: ratio3to1,
       }),
     ],
+    narrativeStatement: "{{name}} was a pillar of {{pronoun.p}} community.",
   },
 ];

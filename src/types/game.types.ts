@@ -30,6 +30,18 @@ interface ConfigOptions {
   // whether to roll the fate die when the
   // season changes
   rollFateAtSeasonChange: boolean;
+  // whether to display cost rules on cards
+  displayCostRules: boolean;
+}
+
+interface NarrativeState {
+  nameOptions: string[];
+  chosenName: string;
+  chosenGender: "M" | "F" | "N";
+  narrativeRecord: string[];
+  config: {
+    presentTense?: boolean;
+  };
 }
 
 export interface GameState {
@@ -45,7 +57,9 @@ export interface GameState {
     roll: number;
     result: FateDieFace;
   };
+  narrativeState: NarrativeState;
   state:
+    | "narrative.init"
     | "playing"
     | "playing.waitingForFateDice"
     | "finished.standard"

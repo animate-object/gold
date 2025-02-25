@@ -80,3 +80,13 @@ export const FateDicePanel = ({ state, onRoll }: Props) => {
     </div>
   );
 };
+
+export const FateDicePanelWrapper = ({ state, onRoll }: Props) => {
+  const isPlaying = state.state.startsWith("playing");
+
+  if (isPlaying) {
+    return <FateDicePanel state={state} onRoll={onRoll} />;
+  }
+
+  return <div className="w-32  bg-slate-600 rounded-md p-1" />;
+};

@@ -67,12 +67,15 @@ const iconStyles: Record<IconNames, string> = {
 
   // TODO: icon styles for seasons & decks
   spring: "text-green-400",
+  fortunesSpring: "text-green-400",
   summer: "text-yellow-400",
+  fortunesSummer: "text-yellow-400",
   fall: "text-orange-400",
+  fortunesFall: "text-orange-400",
   winter: "text-blue-400",
+  fortunesWinter: "text-blue-400",
   // decks
   beginnings: "text-purple-400",
-  misfortune: "text-red-400",
 
   // resources
   time: "bg-slate-200 text-black shadow-md shadow-slate-500/50",
@@ -110,12 +113,15 @@ const iconForName: Record<IconNames, React.ComponentType> = {
 
   // TODO: icon styles for seasons & decks
   spring: Flower,
+  fortunesSpring: Flower,
   summer: Sun,
+  fortunesSummer: Sun,
   fall: Leaf,
+  fortunesFall: Leaf,
   winter: Snowflake,
+  fortunesWinter: Snowflake,
   // decks
   beginnings: Sparkles,
-  misfortune: Dices,
 
   // resources
   time: Clock,

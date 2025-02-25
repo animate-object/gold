@@ -7,7 +7,8 @@ export type GameActionType =
   | "applyEndTurnRules"
   | "incrementTurn"
   | "tradeResources"
-  | "rollFateDice";
+  | "rollFateDice"
+  | "selectNarrativeState";
 
 export type GameActionBase = {
   type: GameActionType;
@@ -44,6 +45,12 @@ export interface RollFateDice extends GameActionBase {
   roll: number;
 }
 
+export interface SelectNarrativeState extends GameActionBase {
+  type: "selectNarrativeState";
+  chosenName: string;
+  chosenGender: "M" | "F" | "N";
+}
+
 export type GameAction =
   | Draft
   | PlayFromFortuneDeck
@@ -51,4 +58,5 @@ export type GameAction =
   | TradeResources
   | ApplyEndTurnRules
   | IncrementTurn
-  | RollFateDice;
+  | RollFateDice
+  | SelectNarrativeState;

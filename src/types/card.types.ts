@@ -40,6 +40,7 @@ interface Card {
   tags: Tags[];
   beginningCard?: boolean;
   fortune?: boolean;
+  narrativeStatement?: string;
 }
 
 export type { Card, CardId };

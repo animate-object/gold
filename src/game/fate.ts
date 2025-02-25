@@ -10,6 +10,7 @@ import {
 } from "../types";
 import { QueueAugmentedState } from "../types/engine.types";
 import { neverLessThanZero } from "../util";
+import { replaceTemplateVariables } from "./narrative";
 import { getCurrentSeason } from "./selectors";
 
 const SPRING_FATE_DICE: FateDieDefinition = {
@@ -122,7 +123,22 @@ export const fateForceDrawFromFortuneDeck = (
 };
 
 export const fateDeath = (state: QueueAugmentedState) => {
-  return { ...state, state: "finished.early" as const };
+  return {
+    ...state,
+    state: "finished.early" as const,
+
+    narrativeState: {
+      ...state.narrativeState,
+      narrativeRecord: [
+        ...state.narrativeState.narrativeRecord,
+        replaceTemplateVariables(
+          "In a sad twist of fate, {{name}} met an untimely end.",
+          state.narrativeState,
+          {}
+        ),
+      ],
+    },
+  };
 };
 
 export const fateResourceChage = (

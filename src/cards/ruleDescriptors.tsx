@@ -47,7 +47,7 @@ const resourceDescriptors = (
 };
 
 export const describeCostRule = ({ resources }: CostRule): string => {
-  return `Cost:${resourceDescriptors(resources).join("・")}`;
+  return `Cost:${resourceDescriptors(resources, "change").join("・")}`;
 };
 
 export const describeRecurrence = ({
@@ -130,7 +130,7 @@ export const describeResourceRule = (rule: ResourceRule): string => {
 
   const match = rule.match ? ` ${describeTagMatch(rule.match)}` : "";
 
-  return `Res:${when}${resourceChange}${match}`;
+  return `Resources:${when}${resourceChange}${match}`;
 };
 
 export const describeReplacementRule = (rule: ReplacementRule): string => {
@@ -215,7 +215,7 @@ export const substituteSymbolsForIcons = (
 ): React.ReactNode => {
   const components = parseRuleDescriptor(stringDescriptor);
   return (
-    <div className="flex flex-wrap gap-0.5">
+    <div className="inline-flex flex-wrap gap-0.5">
       {components.map((component) => {
         if (component.startsWith("[")) {
           return <GameIcon size="sm" tag={component.slice(1, -1) as any} />;

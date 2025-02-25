@@ -66,10 +66,6 @@ const winterFortuneCards = allCards.filter(
   seasonFilter(Season.Winter, { fortune: true, beginning: false })
 );
 
-console.log({
-  springFortuneCards,
-});
-
 const shuffledIds = (cards: Card[]): CardId[] =>
   shuffle(cards.map((card) => card.id));
 

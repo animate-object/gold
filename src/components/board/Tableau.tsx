@@ -8,10 +8,30 @@ import { _capitalize } from "../../util";
 import { GameIcon } from "../GameIcon";
 import { GameState, Season } from "../../types";
 import { Card, EmptyCard } from "../../cards/Card";
+import { Dice3, Skull } from "lucide-react";
 
-export const Tableau = ({ tableau }: GameState) => {
+export const EmptyTableauCard = ({
+  season,
+  idx,
+}: {
+  season: Season;
+  idx: number;
+}) => {
   return (
-    <div className="flex flex-wrap gap-3">
+    <EmptyCard>
+      {idx === 3 && season !== "winter" && <Dice3 className="text-gray-400" />}
+      {idx === 3 && season === "winter" && <Skull className="text-gray-400" />}
+    </EmptyCard>
+  );
+};
+
+export const Tableau = ({
+  tableau,
+  gameConfiguration: { displayCostRules },
+}: GameState) => {
+  console.log({ displayCostRules });
+  return (
+    <div className="flex flex-wrap gap-3 flex-shrink">
       {Object.entries(tableau).map(([season, cards]) => (
         <div
           className={classNames(
@@ -30,8 +50,12 @@ export const Tableau = ({ tableau }: GameState) => {
             <GameIcon tag={season as Season} />
           </h2>
           <div className="flex flex-wrap gap-3">
-            {cards.map((cardId) =>
-              cardId === "empty" ? <EmptyCard /> : <Card cardId={cardId} />
+            {cards.map((cardId, idx) =>
+              cardId === "empty" ? (
+                <EmptyTableauCard idx={idx} season={season as Season} />
+              ) : (
+                <Card cardId={cardId} displayCostRules={displayCostRules} />
+              )
             )}
           </div>
         </div>

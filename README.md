@@ -13,12 +13,7 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 
 ### To Do
 
-- foundation: design rules for all basic cards
-  - in spring
-  - in summer
-  - in fall
-  - in winter
-  - fortune deck
+- theming: 'character creation'
 - mechanic: wildcard resource costs(?)
 - ui: polish
 - ui: card art
@@ -27,11 +22,17 @@ A simple card drafting RPG. One is faced, in every season of life, with finite c
 
 ### In progress
 
-- mechanic: mistakes/fortunes
-- mechanic: fate dice
 
 ### Done
 
+- mechanic: mistakes/fortunes
+- mechanic: fate dice
+- foundation: design rules for all basic cards
+  - in spring
+  - in summer
+  - in fall
+  - in winter
+  - fortune deck
 - foundation: game end
 - ui: basic WIP display
 - ui: start rule description system

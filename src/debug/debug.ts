@@ -1,6 +1,7 @@
-import { allCards } from "./cards/definitions";
-import { Season } from "./types";
-import { _capitalize } from "./util";
+import nlp from "compromise";
+import { allCards } from "../cards/definitions";
+import { GameState, Season } from "../types";
+import { _capitalize } from "../util";
 
 const addToWindow = (key: string, value: any) => {
   (window as unknown as any)[key] = value;
@@ -31,9 +32,22 @@ const printAllCards = ({ filter, season }: PrintArgs = {}) => {
 
 interface DebugArgs {
   playCard: (cardId: number) => void;
+  gameState: GameState;
 }
 
-export const initDebugTools = ({ playCard }: DebugArgs) => {
+export const initDebugTools = ({ playCard, gameState }: DebugArgs) => {
   addToWindow("playCard", playCard);
   addToWindow("printAllCards", printAllCards);
+  addToWindow("gameState", gameState);
+  addToWindow("nlp", nlp);
+};
+
+export const parseQueryParam = (param: string): string | null => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+};
+
+export const flagIsPresent = (flag: string): boolean => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.has(flag);
 };

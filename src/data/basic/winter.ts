@@ -4,6 +4,7 @@ import {
   baseTreasure,
   CardDef,
   costRule,
+  draftDiscount,
   ratio2to1,
   ratio3to1,
   ratio4to1,
@@ -22,12 +23,14 @@ export const WINTER_CARDS: CardDef[] = [
         seasons: [Season.Summer, Season.Fall],
       }),
     ],
+    narrativeStatement: "{{name.p}} children had children.",
   },
   {
     name: "Old Fools",
     season: Season.Winter,
     tags: [Tags.love],
     rules: [baseTreasure(1)],
+    narrativeStatement: "{{name}} found love in their twilight years.",
   },
   {
     name: "Charitable Donations",
@@ -38,12 +41,14 @@ export const WINTER_CARDS: CardDef[] = [
       costRule(0, 6, 0),
       baseTreasure(2),
     ],
+    narrativeStatement: "{{name}} gave back to the community.",
   },
   {
     name: "Constitutional",
     season: Season.Winter,
     tags: [Tags.health, Tags.friend],
     rules: [baseResourceRule(2, 0, 0)],
+    narrativeStatement: "{{name}} took daily walks for sun and vigor.",
   },
   {
     name: "50 Years (Anniversary)",
@@ -56,6 +61,7 @@ export const WINTER_CARDS: CardDef[] = [
         seasons: [Season.Summer, Season.Fall, Season.Winter],
       }),
     ],
+    narrativeStatement: "{{name}} celebrated 50 years of marriage.",
   },
   {
     name: "Lifetime Achievement Award",
@@ -69,12 +75,17 @@ export const WINTER_CARDS: CardDef[] = [
         ratio: ratio2to1,
       }),
     ],
+    narrativeStatement: "{{name.p}} employer recognized many years of service.",
   },
   {
     name: "Sunshine Acres",
     season: Season.Winter,
     tags: [Tags.community, Tags.health],
-    rules: [costRule(2, 2, 0)],
+    rules: [
+      costRule(2, 2, 0),
+      draftDiscount(1, 0, 0, [Tags.community, Tags.health]),
+    ],
+    narrativeStatement: "{{name}} moved to a nice retirement community.",
   },
   {
     name: "Memoirist",
@@ -93,11 +104,15 @@ export const WINTER_CARDS: CardDef[] = [
           Tags.career,
           Tags.education,
           Tags.discipline,
+          Tags.mistake,
+          Tags.tragedy,
         ],
         match: "any",
         ratio: ratio4to1,
       }),
     ],
+    narrativeStatement:
+      '{{name}} penned {{pronoun.p}} memoirs - "it all began..."',
   },
   {
     name: "Matriarch/Patriarch",
@@ -110,12 +125,15 @@ export const WINTER_CARDS: CardDef[] = [
         seasons: [Season.Fall, Season.Winter],
       }),
     ],
+    narrativeStatement:
+      "{{name}} was the head of a large, multigenerational family.",
   },
   {
     name: "Bridge Club",
     season: Season.Winter,
     tags: [Tags.friend, Tags.community],
     rules: [baseResourceRule(0, 0, 1)],
+    narrativeStatement: "{{name}} made new friends playing cards.",
   },
   {
     name: "Beautiful Garden",
@@ -129,18 +147,23 @@ export const WINTER_CARDS: CardDef[] = [
         ratio: ratio2to1,
       }),
     ],
+    narrativeStatement: "{{name}} spent hours tending to {{pronoun.p}} garden.",
   },
   {
     name: "Golf Buddies",
     season: Season.Winter,
     tags: [Tags.friend, Tags.finance],
     rules: [baseTreasure(1)],
+    narrativeStatement:
+      "{{name}} enjoyed many a round of golf with {{pronoun.p}} friends.",
   },
   {
     name: "Fishing Buddies",
     season: Season.Winter,
     tags: [Tags.friend, Tags.sunshine],
     rules: [baseTreasure(1)],
+    narrativeStatement:
+      "{{name}} enjoyed many a day fishing with {{pronoun.p}} friends.",
   },
   {
     name: "Memories",
@@ -153,6 +176,7 @@ export const WINTER_CARDS: CardDef[] = [
         ratio: ratio2to1,
       }),
     ],
+    narrativeStatement: "{{name}} reflected on fond memories.",
   },
   {
     name: "Solace",
@@ -165,6 +189,7 @@ export const WINTER_CARDS: CardDef[] = [
         ratio: ratio3to1,
       }),
     ],
+    narrativeStatement: "{{name}} found peace in {{pronoun.p}} faith.",
   },
   {
     name: "Snowbirds",
@@ -178,6 +203,7 @@ export const WINTER_CARDS: CardDef[] = [
         ratio: ratio4to1,
       }),
     ],
+    narrativeStatement: "{{name}} spent winters in a warmer clime.",
   },
   {
     name: "Four Generations",
@@ -193,6 +219,8 @@ export const WINTER_CARDS: CardDef[] = [
         },
       }),
     ],
+    narrativeStatement:
+      "<Snap> {{name}} was featured in a family photo of four generations.",
   },
   {
     name: "A Life's Work (e.g. art)",
@@ -205,12 +233,14 @@ export const WINTER_CARDS: CardDef[] = [
         ratio: ratio3to1,
       }),
     ],
+    narrativeStatement: "{{name}} looked back on a life's work of fine art.",
   },
   {
     name: "Back to Work",
     season: Season.Winter,
     tags: [Tags.career],
     rules: [costRule(1, 0, 0), baseResourceRule(0, 3, 0)],
+    narrativeStatement: "{{name}} returned to work after retirement.",
   },
   {
     name: "Visitors",
@@ -224,5 +254,13 @@ export const WINTER_CARDS: CardDef[] = [
         seasons: [Season.Spring, Season.Summer],
       }),
     ],
+    narrativeStatement: "{{name}} had many visitors.",
+  },
+  {
+    name: "One last trip",
+    season: Season.Winter,
+    tags: [Tags.travel, Tags.sunshine],
+    rules: [baseTreasure(2)],
+    narrativeStatement: "{{name}} took one last big trip.",
   },
 ];
