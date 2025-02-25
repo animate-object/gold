@@ -1,3 +1,8 @@
+![Life of Aubrie](./src/assets/life-ex.png)
+
+### [Play the beta](https://animate-object.github.io/gold)!
+### [Try narrative mode](https://animate-object.github.io/gold?narrative)
+
 # Game of Life and Death
 
 > I have the nature grow old<br>

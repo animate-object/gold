@@ -1,13 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + Preact + TS</title>
+    <title>Game of Life & Deaths</title>
+    <script
+      type="module"
+      src="https://unpkg.com/ap-banner@0.0.7/index.js"
+    ></script>
+    <style>
+      ap-banner {
+        transition: opacity ease 1s;
+        min-height: 1rem;
+        position: absolute;
+        width: 100vw;
+      }
+      ap-banner:not(:defined) {
+        opacity: 0;
+      }
+      ap-banner:defined {
+        opacity: 1;
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <ap-banner
+      title="Game of Life & Death (beta!)"
+      source="https://github.com/animate-object/gold?tab=readme-ov-file#game-of-life-and-death"
+      ><div slot="more-info">
+        The Game of Life & Death (GoLD) is fully playable, but still undergoing
+        development. Pro tip - if you get stuck, it's time to Roll the Fate Dice
+        in the bottom right.
+        <br /><br />
+        Primary outstanding work items include: Balancing cards, UX Polish,
+        theming enhancements. Stay tuned, and have a nice life!
+      </div>
+    </ap-banner>
   </body>
 </html>
