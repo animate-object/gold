@@ -40,6 +40,7 @@ interface NarrativeState {
   chosenGender: "M" | "F" | "N";
   narrativeRecord: string[];
   config: {
+    showNarrative: boolean;
     presentTense?: boolean;
   };
 }

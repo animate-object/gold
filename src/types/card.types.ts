@@ -24,7 +24,6 @@ enum Tags {
   confidence = "confidence",
   // fortune
   boon = "boon",
-  growth = "growth",
   // misfortunes
   tragedy = "tragedy",
   mistake = "mistake",

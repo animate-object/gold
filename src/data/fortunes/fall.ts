@@ -4,13 +4,10 @@ import {
   baseResourceRule,
   baseTreasure,
   CardDef,
-  costRule,
   draftDiscount,
   draftMarkup,
   forceRollFateDice,
   ratio2to1,
-  ratio3to1,
-  ratio4to1,
   recurringResourceRule,
   replacement,
 } from "../cardUtils";

@@ -3,6 +3,7 @@ import { Decks, Tags } from "../types";
 import React from "preact/compat";
 import {
   Banknote,
+  BicepsFlexed,
   BookCheck,
   Brain,
   Briefcase,
@@ -10,7 +11,6 @@ import {
   Church,
   Clock,
   Contact,
-  Dices,
   Flower,
   Grab,
   GraduationCap,
@@ -28,7 +28,6 @@ import {
   Sparkles,
   Sun,
   TentTree,
-  TrendingUp,
   Users,
 } from "lucide-react";
 import { Tooltip } from "./Tooltip";
@@ -60,7 +59,6 @@ const iconStyles: Record<IconNames, string> = {
   confidence: "bg-cyan-800 text-white shadow-md shadow-cyan-500/50",
   // fortune
   boon: "bg-green-900 text-white shadow-md shadow-green-500/50",
-  growth: "bg-emerald-700 text-white shadow-md shadow-emerald-500/50",
   // misfortunes
   tragedy: "bg-red-700 text-white shadow-md shadow-red-500/50",
   mistake: "bg-red-400 text-white shadow-md shadow-red-500/50",
@@ -90,7 +88,7 @@ const iconForName: Record<IconNames, React.ComponentType> = {
   love: Heart,
   community: HandHeart,
   // disposition tags
-  discipline: Users,
+  discipline: BicepsFlexed,
   faith: Church,
   intellect: Brain,
   creative: Palette,
@@ -106,7 +104,6 @@ const iconForName: Record<IconNames, React.ComponentType> = {
   confidence: Grab,
   // fortune
   boon: BookCheck,
-  growth: TrendingUp,
   // misfortunes
   tragedy: HeartCrack,
   mistake: Meh,

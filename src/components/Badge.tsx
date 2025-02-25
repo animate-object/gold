@@ -29,7 +29,6 @@ const tagStyles: Record<Tags, string> = {
   confidence: "bg-cyan-800 text-white shadow-md shadow-cyan-500/50",
   // fortune
   boon: "bg-green-900 text-white shadow-md shadow-green-500/50",
-  growth: "bg-emerald-700 text-white shadow-md shadow-emerald-500/50",
   // misfortunes
   tragedy: "bg-red-700 text-white shadow-md shadow-red-500/50",
   mistake: "bg-red-400 text-white shadow-md shadow-red-500/50",

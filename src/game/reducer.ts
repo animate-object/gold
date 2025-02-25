@@ -195,7 +195,7 @@ const applyEndTurnRules = (
 
 const incrementTurn = (
   state: QueueAugmentedState,
-  action: IncrementTurn
+  _action: IncrementTurn
 ): QueueAugmentedState => {
   if (state.cardsPlayed >= 16) {
     return {

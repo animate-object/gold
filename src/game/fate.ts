@@ -223,7 +223,7 @@ export const describeDice = (
   const counts: Record<string, number> = {
     empty: emptyFaces,
   };
-  Object.entries(dice).forEach(([key, value]) => {
+  Object.entries(dice).forEach(([_key, value]) => {
     if (isResourceChange(value)) {
       counts["resourceChange"] = (counts["resourceChange"] ?? 0) + 1;
     }

@@ -1,6 +1,6 @@
 import { Deck, DraftCard, EmptyCard } from "../../cards/Card";
 import { getCurrentDeck, getCurrentSeason } from "../../game/selectors";
-import { CardSlot, DisplayableDecks, GameState } from "../../types";
+import { CardSlot, GameState } from "../../types";
 import { _capitalize } from "../../util";
 import { CardCost, CostDisplay } from "./CardCost";
 
@@ -110,7 +110,7 @@ export const PreAndPostGameDraftPanel = ({ state }: Pick<Props, "state">) => {
 
   return (
     <>
-      {Array.from({ length: cardsDrawnPerTurn + 3 }).map((_, idx) => {
+      {Array.from({ length: cardsDrawnPerTurn + 3 }).map((_, _idx) => {
         return (
           <LabeledCards label="">
             <EmptyCard />

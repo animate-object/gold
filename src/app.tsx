@@ -13,6 +13,7 @@ import { FateDicePanelWrapper } from "./components/board/FateDice";
 import { chooseN } from "./utils/array";
 import { NAMES } from "./data/names";
 import { NarrativeTracker } from "./components/board/NarrativeTracker";
+import classNames from "classnames";
 
 const EMPTY_GAME_STATE: GameState = {
   cardsPlayed: 0,
@@ -40,14 +41,15 @@ const EMPTY_GAME_STATE: GameState = {
     rollFateAtSeasonChange: true,
     displayCostRules: true,
   },
-  state: "narrative.init",
+  state: flagIsPresent("narrative") ? "narrative.init" : "playing",
   narrativeState: {
     nameOptions: chooseN(NAMES, 5),
     chosenName: "",
     chosenGender: "N",
     narrativeRecord: [],
     config: {
-      presentTense: flagIsPresent("ivan-mode"),
+      presentTense: flagIsPresent("present"),
+      showNarrative: flagIsPresent("narrative"),
     },
   },
 };
@@ -100,19 +102,28 @@ export function Game() {
     dispatch({ type: "tradeResources", tradeType: "buyInfluence" });
   }, [state]);
 
+  const showNarrative = state.narrativeState.config.showNarrative;
+  const hiddenNarrativeClass = "flex w-80 h-full justify-center items-center";
+
   return (
-    <div className="bg-slate-50 h-screen w-full m-0 absolute top-0">
-      <div className="flex">
-        <NarrativeTracker
-          state={state}
-          onSelectNarrativeState={(name: string, gender: "M" | "F" | "N") => {
-            dispatch({
-              type: "selectNarrativeState",
-              chosenName: name,
-              chosenGender: gender,
-            });
-          }}
-        />
+    <div className="bg-slate-50 h-screen w-full m-0 absolute top-0 flex justify-center items-center">
+      <div
+        className={classNames("flex", {
+          [hiddenNarrativeClass]: !state.narrativeState.config.showNarrative,
+        })}
+      >
+        {showNarrative && (
+          <NarrativeTracker
+            state={state}
+            onSelectNarrativeState={(name: string, gender: "M" | "F" | "N") => {
+              dispatch({
+                type: "selectNarrativeState",
+                chosenName: name,
+                chosenGender: gender,
+              });
+            }}
+          />
+        )}
         <div className="py-2 pe-2 flex flex-wrap flex-shrink">
           <Tableau {...state} />
           <DraftPanel
